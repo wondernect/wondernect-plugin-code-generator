@@ -1,0 +1,38 @@
+<idea-plugin>
+  <id>com.wondernect.plugin.code-generator</id>
+  <name>Wondernect Code Generator</name>
+  <version>1.0</version>
+  <vendor email="sunbeamhome@163.com" url="http://plugins.wondernect.com">WondernectPlugin</vendor>
+
+  <description><![CDATA[
+      针对Wondernect elements & stars使用者提供的一套根据Entity实体类及其属性快速生成代码的IDEA插件.<br>
+      <em>v1.0版本</em>
+    ]]></description>
+
+  <change-notes><![CDATA[
+      20200622发布初始化版本,后续根据个人使用经验继续完善和修改，希望大家多多支持.<br>
+      <em>20200622</em>
+    ]]>
+  </change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+    <!-- Add your actions here -->
+    <action id="com.stars.HelloAction" class="com.wondernect.plugins.code.generator.StringCodeGeneratorAction" text="BaseStringModelGenerate" description="继承BaseStringModel实体类代码生成菜单">
+      <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+    </action>
+  </actions>
+
+</idea-plugin>
