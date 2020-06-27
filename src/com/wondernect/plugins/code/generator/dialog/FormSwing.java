@@ -3,7 +3,8 @@ package com.wondernect.plugins.code.generator.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiFile;
-import com.wondernect.plugins.code.generator.WondernectCodeGenerator;
+import com.wondernect.plugins.code.generator.WondernectBaseLongCodeGenerator;
+import com.wondernect.plugins.code.generator.WondernectBaseStringCodeGenerator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +17,8 @@ import java.awt.*;
  * Description:
  */
 public class FormSwing {
+    // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel(ID为String); 3-BaseModel(ID为Long);
+    private int baseModelType;
     private Project project;
     private PsiFile psiFile;
 
@@ -32,7 +35,8 @@ public class FormSwing {
     private JLabel service = new JLabel("服务：");
     private JTextField serviceContent = new JTextField();
 
-    public FormSwing(Project project, PsiFile psiFile) {
+    public FormSwing(int baseModelType, Project project, PsiFile psiFile) {
+        this.baseModelType = baseModelType;
         this.project = project;
         this.psiFile = psiFile;
     }
@@ -81,9 +85,37 @@ public class FormSwing {
                     service == null || "".equals(service.trim())) {
                 Messages.showMessageDialog(project, "任一信息不能为空", "ERROR", Messages.getErrorIcon());
             } else {
-                WondernectCodeGenerator wondernectCodeGenerator = new WondernectCodeGenerator(project, psiFile, author, version, service);
-                wondernectCodeGenerator.generateCode();
-                r2.setText("代码生成完毕!!!");
+                // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel(ID为String); 3-BaseModel(ID为Long);
+                switch (baseModelType) {
+                    case 0:
+                    {
+                        WondernectBaseStringCodeGenerator wondernectBaseStringCodeGenerator = new WondernectBaseStringCodeGenerator(project, psiFile, author, version, service);
+                        wondernectBaseStringCodeGenerator.generateCode();
+                        break;
+                    }
+                    case 1:
+                    {
+                        WondernectBaseLongCodeGenerator wondernectBaseLongCodeGenerator = new WondernectBaseLongCodeGenerator(project, psiFile, author, version, service);
+                        wondernectBaseLongCodeGenerator.generateCode();
+                        break;
+                    }
+                    case 2:
+                    {
+
+                        break;
+                    }
+                    case 3:
+                    {
+
+                        break;
+                    }
+                    default:
+                    {
+                        Messages.showMessageDialog(project, "BaseModel类型选择有误", "ERROR", Messages.getErrorIcon());
+                        break;
+                    }
+                }
+                r2.setText("执行完毕!!!");
             }
         });
         return south;

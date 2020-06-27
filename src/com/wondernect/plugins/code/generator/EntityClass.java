@@ -39,11 +39,14 @@ public class EntityClass {
     private String pageRequestDTOName;
     private String pageRequestDTOVariableName;
 
+    private String serviceInterfaceName;
+    private String serviceInterfaceVariableName;
+
+    private String serviceAbstractName;
+    private String serviceAbstractVariableName;
+
     private String serviceName;
     private String serviceVariableName;
-
-    private String serviceImplName;
-    private String serviceImplVariableName;
 
     private String controllerName;
     private String controllerVariableName;
@@ -196,6 +199,32 @@ public class EntityClass {
         return pageRequestDTOVariableName;
     }
 
+    public String getServiceInterfaceName() {
+        return serviceInterfaceName;
+    }
+
+    public void setServiceInterfaceName(String serviceInterfaceName) {
+        this.serviceInterfaceName = serviceInterfaceName;
+        this.serviceInterfaceVariableName = PsiStringUtils.firstLetterToLower(serviceInterfaceName);
+    }
+
+    public String getServiceInterfaceVariableName() {
+        return serviceInterfaceVariableName;
+    }
+
+    public String getServiceAbstractName() {
+        return serviceAbstractName;
+    }
+
+    public void setServiceAbstractName(String serviceAbstractName) {
+        this.serviceAbstractName = serviceAbstractName;
+        this.serviceAbstractVariableName = PsiStringUtils.firstLetterToLower(serviceAbstractName);
+    }
+
+    public String getServiceAbstractVariableName() {
+        return serviceAbstractVariableName;
+    }
+
     public String getServiceName() {
         return serviceName;
     }
@@ -207,19 +236,6 @@ public class EntityClass {
 
     public String getServiceVariableName() {
         return serviceVariableName;
-    }
-
-    public String getServiceImplName() {
-        return serviceImplName;
-    }
-
-    public void setServiceImplName(String serviceImplName) {
-        this.serviceImplName = serviceImplName;
-        this.serviceImplVariableName = PsiStringUtils.firstLetterToLower(serviceImplName);
-    }
-
-    public String getServiceImplVariableName() {
-        return serviceImplVariableName;
     }
 
     public String getControllerName() {

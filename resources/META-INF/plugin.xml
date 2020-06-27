@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.wondernect.plugin.code-generator</id>
   <name>Wondernect Code Generator</name>
-  <version>1.0</version>
+  <version>1.1</version>
   <vendor email="sunbeamhome@163.com" url="http://plugins.wondernect.com">WondernectPlugin</vendor>
 
   <description><![CDATA[
@@ -10,8 +10,10 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      完善BaseStringModel生成代码，添加BaseLongModel生成代码.<br>
+      <em>1.1</em>
       20200622发布初始化版本,后续根据个人使用经验继续完善和修改，希望大家多多支持.<br>
-      <em>20200622</em>
+      <em>1.0</em>
     ]]>
   </change-notes>
 
@@ -28,7 +30,10 @@
 
   <actions>
     <!-- Add your actions here -->
-    <action id="com.stars.HelloAction" class="com.wondernect.plugins.code.generator.StringCodeGeneratorAction" text="BaseStringModelGenerate" description="继承BaseStringModel实体类代码生成菜单">
+    <action id="com.wondernect.stars.BaseLongCodeGeneratorAction" class="com.wondernect.plugins.code.generator.BaseLongCodeGeneratorAction" text="BaseLongModelGenerate" description="继承BaseLongModel实体类代码生成菜单">
+      <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+    </action>
+    <action id="com.wondernect.stars.BaseStringCodeGeneratorAction" class="com.wondernect.plugins.code.generator.BaseStringCodeGeneratorAction" text="BaseStringModelGenerate" description="继承BaseStringModel实体类代码生成菜单">
       <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
     </action>
   </actions>

@@ -18,13 +18,13 @@ public class FormDialog extends DialogWrapper {
 
     private FormSwing formTestSwing;
 
-    public FormDialog(@Nullable Project project, @Nullable PsiFile psiFile) {
+    public FormDialog(int baseModelType, @Nullable Project project, @Nullable PsiFile psiFile) {
         super(true);
         assert project != null;
         assert psiFile != null;
         // 获取到当前项目的名称设置会话框标题
         setTitle(project.getName());
-        formTestSwing = new FormSwing(project, psiFile);
+        formTestSwing = new FormSwing(baseModelType, project, psiFile);
         //触发一下init方法，否则swing样式将无法展示在会话框
         init();
     }

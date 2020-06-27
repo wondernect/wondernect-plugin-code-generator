@@ -22,7 +22,7 @@ import java.util.function.Consumer;
  * Date: 2020-06-21 23:30
  * Description: wondernect code generator
  */
-public class WondernectCodeGenerator {
+public class WondernectBaseLongCodeGenerator {
 
     private PsiDirectory workDir;
     private Map<String, PsiDirectory> directoryMap = new HashMap<>(16);
@@ -36,7 +36,7 @@ public class WondernectCodeGenerator {
     private String version;
     private String service;
 
-    public WondernectCodeGenerator(Project project, PsiFile psiFile, String author, String version, String service) {
+    public WondernectBaseLongCodeGenerator(Project project, PsiFile psiFile, String author, String version, String service) {
         this.project = project;
         this.psiFile = psiFile;
         this.author = author;
@@ -94,10 +94,12 @@ public class WondernectCodeGenerator {
         WriteCommandAction.runWriteCommandAction(project, () -> createListRequestDTO(entityClass));
         // 创建pageRequestDTO
         WriteCommandAction.runWriteCommandAction(project, () -> createPageRequestDTO(entityClass));
+        // 创建service interface
+        WriteCommandAction.runWriteCommandAction(project, () -> createServiceInterface(entityClass));
+        // 创建service abstract
+        WriteCommandAction.runWriteCommandAction(project, () -> createServiceAbstract(entityClass));
         // 创建service
         WriteCommandAction.runWriteCommandAction(project, () -> createService(entityClass));
-        // 创建service impl
-        WriteCommandAction.runWriteCommandAction(project, () -> createServiceImpl(entityClass));
         // 创建controller
         WriteCommandAction.runWriteCommandAction(project, () -> createController(entityClass));
     }
@@ -134,12 +136,12 @@ public class WondernectCodeGenerator {
         PsiDirectory repositoryDirectory = directoryMap.get("repository");
         String repositoryName = entityClass.getEntityName().concat("Repository");
         getBaseClass(
-                "BaseStringRepository",
-                baseStringRepositoryClass -> ClassCreator.of(module).init(repositoryName,
+                "BaseLongRepository",
+                baseLongRepositoryClass -> ClassCreator.of(module).init(repositoryName,
                         getCommentContent(entityClass.getEntityDescription() + "数据库操作类", entityClass.getAuthor()) +
-                                "\npublic interface " + repositoryName + " extends BaseStringRepository<" + entityClass.getEntityName() + "> {}")
+                                "\npublic interface " + repositoryName + " extends BaseLongRepository<" + entityClass.getEntityName() + "> {}")
                         .importClass(entityClass.getEntityClass())
-                        .importClass(baseStringRepositoryClass)
+                        .importClass(baseLongRepositoryClass)
                         .addTo(repositoryDirectory)
         );
         entityClass.setRepositoryName(repositoryName);
@@ -152,13 +154,13 @@ public class WondernectCodeGenerator {
         PsiDirectory daoDirectory = directoryMap.get("dao");
         String daoName = entityClass.getEntityName().concat("Dao");
         getBaseClass(
-                "BaseStringDao",
-                baseStringDaoClass -> ClassCreator.of(module).init(daoName,
+                "BaseLongDao",
+                baseLongDaoClass -> ClassCreator.of(module).init(daoName,
                         getCommentContent(entityClass.getEntityDescription() + "数据库操作类", entityClass.getAuthor()) +
-                                "\n@Repository \npublic class " + daoName + " extends BaseStringDao<" + entityClass.getEntityName() + "> {}")
+                                "\n@Repository \npublic class " + daoName + " extends BaseLongDao<" + entityClass.getEntityName() + "> {}")
                         .importClass("org.springframework.stereotype.Repository")
                         .importClass(entityClass.getEntityClass())
-                        .importClass(baseStringDaoClass)
+                        .importClass(baseLongDaoClass)
                         .addTo(daoDirectory)
         );
         entityClass.setDaoName(daoName);
@@ -171,15 +173,15 @@ public class WondernectCodeGenerator {
         PsiDirectory managerDirectory = directoryMap.get("manager");
         String managerName = entityClass.getEntityName().replace("Entity", "").concat("Manager");
         getBaseClass(
-                "BaseStringManager",
-                baseStringManagerClass -> ClassCreator.of(module).init(
+                "BaseLongManager",
+                baseLongManagerClass -> ClassCreator.of(module).init(
                         managerName,
                         getCommentContent(entityClass.getEntityDescription() + "服务操作类", entityClass.getAuthor()) +
-                                "\n@Service \npublic class " + managerName + " extends BaseStringManager<" + entityClass.getEntityName() + "> {}"
+                                "\n@Service \npublic class " + managerName + " extends BaseLongManager<" + entityClass.getEntityName() + "> {}"
                 )
                         .importClass("org.springframework.stereotype.Service")
                         .importClass(entityClass.getEntityClass())
-                        .importClass(baseStringManagerClass)
+                        .importClass(baseLongManagerClass)
                         .addTo(managerDirectory)
         );
         entityClass.setManagerName(managerName);
@@ -201,7 +203,7 @@ public class WondernectCodeGenerator {
                         "\n@AllArgsConstructor" +
                         "\n@ApiModel(value = \""+ requestDTODesc +"\")" +
                         "\npublic class " + requestDTOName + " {" +
-                        "\n" + getFieldsContent(entityClass) +
+                        "\n" + getFieldsContentForREQDTO(entityClass) +
                         "}"
         )
                 .importClass("lombok.Data")
@@ -233,7 +235,7 @@ public class WondernectCodeGenerator {
                         "\n@AllArgsConstructor" +
                         "\n@ApiModel(value = \""+ responseDTODesc +"\")" +
                         "\npublic class " + responseDTOName + " {" +
-                        "\n" + getFieldsContent(entityClass) +
+                        "\n" + getFieldsContentForRESDTO(entityClass) +
                         "}"
         )
                 .importClass("lombok.Data")
@@ -242,10 +244,6 @@ public class WondernectCodeGenerator {
                 .importClass("io.swagger.annotations.ApiModel")
                 .importClass("io.swagger.annotations.ApiModelProperty")
                 .importClass("com.fasterxml.jackson.annotation.JsonProperty")
-                .importClass("org.hibernate.validator.constraints.Length")
-                .importClass("javax.validation.constraints.NotBlank")
-                .importClass("javax.validation.constraints.NotNull")
-                .importClass("com.fasterxml.jackson.annotation.JsonFormat")
                 .addTo(dtoDirectory);
         entityClass.setResponseDTOName(responseDTOName);
     }
@@ -318,11 +316,11 @@ public class WondernectCodeGenerator {
     /**
      * 创建Service接口
      */
-    private void createService(EntityClass entityClass) {
-        PsiDirectory serviceDirectory = directoryMap.get("service");
-        String serviceName = entityClass.getEntityName().concat("Service");
+    private void createServiceInterface(EntityClass entityClass) {
+        PsiDirectory serviceInterfaceDirectory = directoryMap.get("service/impl");
+        String serviceInterfaceName = entityClass.getEntityName().concat("Interface");
         String content = getCommentContent(entityClass.getEntityDescription() + "服务接口类", entityClass.getAuthor()) +
-                "\npublic interface " + serviceName + " {\n" +
+                "\npublic interface " + serviceInterfaceName + " {\n" +
                 "\n/** " +
                 "\n * 创建" +
                 "\n**/" +
@@ -330,15 +328,15 @@ public class WondernectCodeGenerator {
                 "\n/** " +
                 "\n * 更新" +
                 "\n**/" +
-                "\n" + entityClass.getResponseDTOName() + " update(String id, " + entityClass.getRequestDTOName() + " " + entityClass.getRequestDTOVariableName() + "); " +
+                "\n" + entityClass.getResponseDTOName() + " update(Long id, " + entityClass.getRequestDTOName() + " " + entityClass.getRequestDTOVariableName() + "); " +
                 "\n/** " +
                 "\n * 删除" +
                 "\n**/" +
-                "\nvoid deleteById(String id);" +
+                "\nvoid deleteById(Long id);" +
                 "\n/** " +
                 "\n * 获取详细信息" +
                 "\n**/" +
-                "\n" + entityClass.getResponseDTOName() + " findById(String id); " +
+                "\n" + entityClass.getResponseDTOName() + " findById(Long id); " +
                 "\n/** " +
                 "\n * 列表" +
                 "\n**/" +
@@ -348,68 +346,111 @@ public class WondernectCodeGenerator {
                 "\n**/" +
                 "\nPageResponseData<" + entityClass.getResponseDTOName() + "> page(" + entityClass.getPageRequestDTOName() + " " + entityClass.getPageRequestDTOVariableName() + "); " +
                 "\n}";
-        ClassCreator.of(module).init(serviceName, content)
+        ClassCreator.of(module).init(serviceInterfaceName, content)
                 .importClass(entityClass.getRequestDTOName())
                 .importClass(entityClass.getResponseDTOName())
                 .importClass(entityClass.getListRequestDTOName())
                 .importClass(entityClass.getPageRequestDTOName())
                 .importClass("java.util.List")
                 .importClass("com.wondernect.elements.rdb.response.PageResponseData")
-                .addTo(serviceDirectory);
-        entityClass.setServiceName(serviceName);
+                .addTo(serviceInterfaceDirectory);
+        entityClass.setServiceInterfaceName(serviceInterfaceName);
+    }
+
+    /**
+     * 创建服务抽象类
+     */
+    private void createServiceAbstract(EntityClass entityClass) {
+        PsiDirectory serviceAbstractDirectory = directoryMap.get("service/impl");
+        String serviceAbstractName = entityClass.getEntityName().concat("AbstractService");
+        String content = getCommentContent(entityClass.getEntityDescription() + "服务抽象实现类", entityClass.getAuthor()) +
+                "\n@Service\npublic abstract class " + serviceAbstractName + " extends BaseLongService<" + entityClass.getResponseDTOName() + ", " + entityClass.getEntityName() + "> implements " + entityClass.getServiceInterfaceName() + "{\n" +
+                "\n@Transactional" +
+                "\n@Override" +
+                "\npublic " + entityClass.getResponseDTOName() + " create(" + entityClass.getRequestDTOName() + " " + entityClass.getRequestDTOVariableName() + ") {" +
+                "\n//TODO:判断对象是否存在" +
+                "\n" +
+                "\n" + entityClass.getEntityName() + " " + entityClass.getEntityVariableName() + " = new " + entityClass.getEntityName() + "();" +
+                "\nESBeanUtils.copyProperties(" + entityClass.getRequestDTOVariableName() + ", " + entityClass.getEntityVariableName() + ");" +
+                "\nreturn super.save(" + entityClass.getEntityVariableName() + ");" +
+                "\n}" +
+                "\n@Transactional" +
+                "\n@Override" +
+                "\npublic " + entityClass.getResponseDTOName() + " update(Long id, " + entityClass.getRequestDTOName() + " " + entityClass.getRequestDTOVariableName() + ") {" +
+                "\n" + entityClass.getEntityName() + " " + entityClass.getEntityVariableName() + " = super.findEntityById(id);" +
+                "\nif (ESObjectUtils.isNull(" + entityClass.getEntityVariableName() + ")) {" +
+                "\nthrow new BusinessException(\"" + entityClass.getEntityDescription() + "不存在\");" +
+                "\n}" +
+                "\nESBeanUtils.copyWithoutNullAndIgnoreProperties(" + entityClass.getRequestDTOVariableName() + ", " + entityClass.getEntityVariableName() + ");" +
+                "\nreturn super.save(" + entityClass.getEntityVariableName() + ");" +
+                "\n}" +
+                "\n@Override" +
+                "\npublic List<" + entityClass.getResponseDTOName() + "> list(" + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() + ") {" +
+                "\nCriteria<" + entityClass.getEntityName() + "> " + entityClass.getEntityVariableName() + "Criteria = new Criteria<>();" +
+                "\n//TODO:添加列表筛选条件" +
+                "\n" +
+                "\nreturn super.findAll(" + entityClass.getEntityVariableName() + "Criteria, " + entityClass.getListRequestDTOVariableName() + ".getSortDataList());" +
+                "\n}" +
+                "\n@Override" +
+                "\npublic PageResponseData<" + entityClass.getResponseDTOName() + "> page(" + entityClass.getPageRequestDTOName() + " " + entityClass.getPageRequestDTOVariableName() + ") {" +
+                "\nCriteria<" + entityClass.getEntityName() + "> " + entityClass.getEntityVariableName() + "Criteria = new Criteria<>();" +
+                "\n//TODO:添加分页筛选条件" +
+                "\n" +
+                "\nreturn super.findAll(" + entityClass.getEntityVariableName() + "Criteria, " + entityClass.getPageRequestDTOVariableName() + ".getPageRequestData());" +
+                "\n}" +
+                "\n@Override" +
+                "\npublic " + entityClass.getResponseDTOName() + " generate(" + entityClass.getEntityName() + " " + entityClass.getEntityVariableName() + ") {" +
+                "\n" + entityClass.getResponseDTOName() + " " + entityClass.getResponseDTOVariableName() + " = new " + entityClass.getResponseDTOName() + "();" +
+                "\nESBeanUtils.copyProperties(" + entityClass.getEntityVariableName() + ", " + entityClass.getResponseDTOVariableName() + ");" +
+                "\n" + entityClass.getResponseDTOVariableName() + ".setId(" + entityClass.getEntityVariableName() + ".getId());" +
+                "\nreturn " + entityClass.getResponseDTOVariableName() + ";" +
+                "\n}" +
+
+                "\n}"
+                ;
+        getBaseClass(
+                "BaseLongService",
+                baseLongServiceClass -> ClassCreator.of(module).init(
+                        serviceAbstractName,
+                        content
+                )
+                        .importClass(entityClass.getServiceInterfaceName())
+                        .importClass(entityClass.getEntityName())
+                        .importClass(entityClass.getRequestDTOName())
+                        .importClass(entityClass.getResponseDTOName())
+                        .importClass(entityClass.getListRequestDTOName())
+                        .importClass(entityClass.getPageRequestDTOName())
+                        .importClass("org.springframework.stereotype.Service")
+                        .importClass("org.springframework.beans.factory.annotation.Autowired")
+                        .importClass("org.springframework.transaction.annotation.Transactional")
+                        .importClass("java.util.List")
+                        .importClass(baseLongServiceClass)
+                        .importClass("com.wondernect.elements.rdb.criteria.Criteria")
+                        .importClass("com.wondernect.elements.rdb.response.PageResponseData")
+                        .importClass("com.wondernect.elements.common.utils.ESBeanUtils")
+                        .importClass("com.wondernect.elements.common.utils.ESObjectUtils")
+                        .importClass("com.wondernect.elements.common.exception.BusinessException")
+                        .addTo(serviceAbstractDirectory)
+        );
+        entityClass.setServiceAbstractName(serviceAbstractName);
     }
 
     /**
      * 创建服务实现类
      */
-    private void createServiceImpl(EntityClass entityClass) {
-        PsiDirectory serviceImplDirectory = directoryMap.get("service/impl");
-        String serviceImplName = "Default" + entityClass.getEntityName().concat("Service");
-        String content = getCommentContent(entityClass.getEntityDescription() + "服务具体实现类", entityClass.getAuthor()) +
-                "\n@Service\npublic class " + serviceImplName + " implements " + entityClass.getServiceName() + "{\n" +
-                "\n@Autowired\nprivate " + entityClass.getManagerName() + " " + entityClass.getManagerVariableName() + ";\n" +
-                "\n@Transactional\npublic " + entityClass.getResponseDTOName() + " create(" + entityClass.getRequestDTOName() + " " + entityClass.getRequestDTOVariableName() + ") {" +
-                "\n" +
-                "\nreturn null;" +
-                "\n}" +
-                "\n@Transactional\npublic " + entityClass.getResponseDTOName() + " update(String id, " + entityClass.getRequestDTOName() + " " + entityClass.getRequestDTOVariableName() + ") {" +
-                "\n" +
-                "\nreturn null;" +
-                "\n}" +
-                "\n@Transactional\npublic void deleteById(String id) {" +
-                "\n" +
-                "\n}" +
-                "\npublic " + entityClass.getResponseDTOName() + " findById(String id) {" +
-                "\n" +
-                "\nreturn null;" +
-                "\n}" +
-                "\npublic List<" + entityClass.getResponseDTOName() + "> list(" + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() + ") {" +
-                "\n" +
-                "\nreturn null;" +
-                "\n}" +
-                "\npublic PageResponseData<" + entityClass.getResponseDTOName() + "> page(" + entityClass.getPageRequestDTOName() + " " + entityClass.getPageRequestDTOVariableName() + ") {" +
-                "\n" +
-                "\nreturn null;" +
-                "\n}" +
-
+    private void createService(EntityClass entityClass) {
+        PsiDirectory serviceDirectory = directoryMap.get("service");
+        String serviceName = entityClass.getEntityName().concat("Service");
+        String content = getCommentContent(entityClass.getEntityDescription() + "服务", entityClass.getAuthor()) +
+                "\n@Service\npublic class " + serviceName + " extends " + entityClass.getServiceAbstractName() + "{\n" +
                 "\n}"
                 ;
-
-        ClassCreator.of(module).init(serviceImplName, content)
-                .importClass(entityClass.getServiceName())
-                .importClass(entityClass.getManagerName())
-                .importClass(entityClass.getRequestDTOName())
-                .importClass(entityClass.getResponseDTOName())
-                .importClass(entityClass.getListRequestDTOName())
-                .importClass(entityClass.getPageRequestDTOName())
+        ClassCreator.of(module).init(serviceName, content)
+                .importClass(entityClass.getServiceAbstractName())
                 .importClass("org.springframework.stereotype.Service")
-                .importClass("org.springframework.beans.factory.annotation.Autowired")
-                .importClass("org.springframework.transaction.annotation.Transactional")
-                .importClass("java.util.List")
-                .importClass("com.wondernect.elements.rdb.response.PageResponseData")
-                .addTo(serviceImplDirectory);
+                .addTo(serviceDirectory);
+        entityClass.setServiceName(serviceName);
     }
-
 
     /**
      * 创建接口
@@ -435,7 +476,7 @@ public class WondernectCodeGenerator {
 
                 "\n@ApiOperation(value = \"更新\", httpMethod = \"POST\")\n@PostMapping(value = \"/{id}/update\")" +
                 "\npublic BusinessData<" + entityClass.getResponseDTOName() + "> update(" +
-                "\n@ApiParam(required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) String id," +
+                "\n@ApiParam(required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) Long id," +
                 "\n@ApiParam(required = true) @NotNull(message = \"请求参数不能为空\") @Validated @RequestBody(required = false) " + entityClass.getRequestDTOName() + " " + entityClass.getRequestDTOVariableName() +
                 "\n) {" +
                 "\nreturn new BusinessData<>(" + entityClass.getServiceVariableName() + ".update(id, " + entityClass.getRequestDTOVariableName() +"));" +
@@ -443,7 +484,7 @@ public class WondernectCodeGenerator {
 
                 "\n@ApiOperation(value = \"删除\", httpMethod = \"POST\")\n@PostMapping(value = \"/{id}/delete\")" +
                 "\npublic BusinessData delete(" +
-                "\n@ApiParam(required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) String id" +
+                "\n@ApiParam(required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) Long id" +
                 "\n) {" +
                 "\n" + entityClass.getServiceVariableName() + ".deleteById(id);" +
                 "\nreturn new BusinessData(BusinessError.SUCCESS);" +
@@ -451,7 +492,7 @@ public class WondernectCodeGenerator {
 
                 "\n@ApiOperation(value = \"获取详细信息\", httpMethod = \"GET\")\n@GetMapping(value = \"/{id}/detail\")" +
                 "\npublic BusinessData<" + entityClass.getResponseDTOName() + "> detail(" +
-                "\n@ApiParam(required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) String id" +
+                "\n@ApiParam(required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) Long id" +
                 "\n) {" +
                 "\nreturn new BusinessData<>(" + entityClass.getServiceVariableName() + ".findById(id));" +
                 "\n}" +
@@ -519,7 +560,7 @@ public class WondernectCodeGenerator {
                 " **/";
     }
 
-    private String getFieldsContent(EntityClass entityClass) {
+    private String getFieldsContentForREQDTO(EntityClass entityClass) {
         String content = "";
         for (PsiField field : entityClass.getEntityClass().getFields()) {
             String name = field.getName();
@@ -572,6 +613,45 @@ public class WondernectCodeGenerator {
                     }
                 }
             }
+            if (typeName.toLowerCase().equals("localdate")) {
+                content = content + "\n@JsonFormat(pattern = \"yyyy-MM-dd\")";
+            } else if (typeName.toLowerCase().equals("localdatetime")) {
+                content = content + "\n@JsonFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")";
+            }
+            content = content + "\n@JsonProperty(\"" + PsiStringUtils.toUnderLineStr(name) + "\")";
+            content = content + "\n@ApiModelProperty(notes = \"" + description + "\")";
+            content = content + "\nprivate " + typeName + " " + name + ";\n";
+        }
+        return content;
+    }
+
+    private String getFieldsContentForRESDTO(EntityClass entityClass) {
+        String content = "";
+        content = content + "\n@JsonProperty(\"id\")";
+        content = content + "\n@ApiModelProperty(notes = \"" + entityClass.getEntityDescription() + "id\")";
+        content = content + "\nprivate Long id;\n";
+        for (PsiField field : entityClass.getEntityClass().getFields()) {
+            String name = field.getName();
+            PsiType type = field.getType();
+            String typeName = type.getCanonicalText();
+            if (typeName.contains(".")) {
+                typeName = typeName.substring(typeName.lastIndexOf(".") + 1);
+            }
+            // @ApiModelProperty注解
+            PsiAnnotation fieldAnnotation = field.getAnnotation("io.swagger.annotations.ApiModelProperty");
+            Optional<String> descriptionOptional = psiUtils.getAnnotationValue(fieldAnnotation, "value");
+            String description = null;
+            if (descriptionOptional.isPresent()) {
+                description = descriptionOptional.get();
+            } else {
+                descriptionOptional = psiUtils.getAnnotationValue(fieldAnnotation, "description");
+                if (descriptionOptional.isPresent()) {
+                    description = descriptionOptional.get();
+                }
+            }
+            assert description != null;
+            description = description.replace("\"", "");
+
             if (typeName.toLowerCase().equals("localdate")) {
                 content = content + "\n@JsonFormat(pattern = \"yyyy-MM-dd\")";
             } else if (typeName.toLowerCase().equals("localdatetime")) {

@@ -14,7 +14,7 @@ import com.wondernect.plugins.code.generator.dialog.FormDialog;
  *
  * @author cxhome
  */
-public class StringCodeGeneratorAction extends AnAction {
+public class BaseStringCodeGeneratorAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
@@ -23,7 +23,7 @@ public class StringCodeGeneratorAction extends AnAction {
         PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
         assert psiFile != null;
 
-        FormDialog formTestDialog = new FormDialog(project, psiFile);
+        FormDialog formTestDialog = new FormDialog(0, project, psiFile);
         //是否允许用户通过拖拽的方式扩大或缩小你的表单框，我这里定义为true，表示允许
         formTestDialog.setResizable(true);
         formTestDialog.show();
