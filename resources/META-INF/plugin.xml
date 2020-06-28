@@ -1,15 +1,18 @@
 <idea-plugin>
   <id>com.wondernect.plugin.code-generator</id>
   <name>Wondernect Code Generator</name>
-  <version>1.1</version>
+  <version>1.2</version>
   <vendor email="sunbeamhome@163.com" url="http://plugins.wondernect.com">WondernectPlugin</vendor>
 
   <description><![CDATA[
       针对Wondernect elements & stars使用者提供的一套根据Entity实体类及其属性快速生成代码的IDEA插件.<br>
-      <em>v1.0版本</em>
+      <em>v1版本</em>
     ]]></description>
 
   <change-notes><![CDATA[
+      按照model下entity实体所在目录在对应文件夹下生成对应目录.<br>
+      eg:Student实体在model下student文件夹中，那么生成代码时会自动在repository、dao等文件夹下生成student文件夹来存储Student实体相关的代码.<br>
+      <em>1.2</em><br>
       完善BaseStringModel生成代码，添加BaseLongModel生成代码.<br>
       <em>1.1</em><br>
       20200622发布初始化版本,后续根据个人使用经验继续完善和修改，希望大家多多支持.<br>

@@ -25,11 +25,12 @@ import java.util.function.Consumer;
 public class WondernectBaseLongCodeGenerator {
 
     private PsiDirectory workDir;
-    private Map<String, PsiDirectory> directoryMap = new HashMap<>(16);
+    private Map<String, PsiDirectory> directoryMap = new HashMap<>();
 
     private Project project;
     private PsiFile psiFile;
     private PsiDirectory containerDirectory;
+    private String currentDirectory;
     private PsiUtils psiUtils;
     private Module module;
     private String author;
@@ -57,7 +58,14 @@ public class WondernectBaseLongCodeGenerator {
         }
         // 获取当前实体所在目录的上级目录
         containerDirectory = psiClass.getContainingFile().getContainingDirectory();
+        currentDirectory = containerDirectory.getName();
+        if (currentDirectory.contains("model") || currentDirectory.contains("entity")) {
+            currentDirectory = null;
+        }
         workDir = containerDirectory.getParentDirectory();
+        if (currentDirectory != null) {
+            workDir = workDir.getParentDirectory();
+        }
         module = FileIndexFacade.getInstance(project).getModuleForFile(classes[0].getContainingFile().getVirtualFile());
         psiUtils = PsiUtils.of(module);
         // 加载所有目录
@@ -108,21 +116,23 @@ public class WondernectBaseLongCodeGenerator {
      * 初始化所有文件夹
      */
     private void initDirs() {
-        List<String> directories = Arrays.asList("repository", "dao", "manager", "dto", "service", "service/impl", "controller");
+        List<String> directories = Arrays.asList("repository", "dao", "manager", "dto", "service", "controller");
         directoryMap.clear();
         directories.forEach(dir -> {
-            if (!dir.contains("/")) {
-                PsiDirectory directory = workDir.findSubdirectory(dir);
-                if (null == directory) {
-                    directory = workDir.createSubdirectory(dir);
-                }
-                directoryMap.put(dir, directory);
-            } else {
+            // 创建1级目录
+            PsiDirectory directory = workDir.findSubdirectory(dir);
+            if (null == directory) {
+                directory = workDir.createSubdirectory(dir);
+            }
+            directoryMap.put(dir, directory);
+            // 如果需要则创建2级目录
+            if (currentDirectory != null) {
+                dir = dir + "/" + currentDirectory;
                 String[] dirs = dir.split("/");
-                PsiDirectory directory = workDir.findSubdirectory(dirs[0]);
-                PsiDirectory subDir = directory.findSubdirectory(dirs[1]);
+                PsiDirectory subdirectory = workDir.findSubdirectory(dirs[0]);
+                PsiDirectory subDir = subdirectory.findSubdirectory(dirs[1]);
                 if (null == subDir) {
-                    subDir = directory.createSubdirectory(dirs[1]);
+                    subDir = subdirectory.createSubdirectory(dirs[1]);
                 }
                 directoryMap.put(dir, subDir);
             }
@@ -133,7 +143,8 @@ public class WondernectBaseLongCodeGenerator {
      * 创建Repository
      */
     private void createRepository(EntityClass entityClass) {
-        PsiDirectory repositoryDirectory = directoryMap.get("repository");
+        String dir = currentDirectory == null ? "repository" : "repository/" + currentDirectory;
+        PsiDirectory repositoryDirectory = directoryMap.get(dir);
         String repositoryName = entityClass.getEntityName().concat("Repository");
         getBaseClass(
                 "BaseLongRepository",
@@ -151,7 +162,8 @@ public class WondernectBaseLongCodeGenerator {
      * 创建Dao
      */
     private void createDao(EntityClass entityClass) {
-        PsiDirectory daoDirectory = directoryMap.get("dao");
+        String dir = currentDirectory == null ? "dao" : "dao/" + currentDirectory;
+        PsiDirectory daoDirectory = directoryMap.get(dir);
         String daoName = entityClass.getEntityName().concat("Dao");
         getBaseClass(
                 "BaseLongDao",
@@ -170,7 +182,8 @@ public class WondernectBaseLongCodeGenerator {
      * 创建Manager
      */
     private void createManager(EntityClass entityClass) {
-        PsiDirectory managerDirectory = directoryMap.get("manager");
+        String dir = currentDirectory == null ? "manager" : "manager/" + currentDirectory;
+        PsiDirectory managerDirectory = directoryMap.get(dir);
         String managerName = entityClass.getEntityName().replace("Entity", "").concat("Manager");
         getBaseClass(
                 "BaseLongManager",
@@ -191,7 +204,8 @@ public class WondernectBaseLongCodeGenerator {
      * 创建RequestDTO
      */
     private void createRequestDTO(EntityClass entityClass) {
-        PsiDirectory dtoDirectory = directoryMap.get("dto");
+        String dir = currentDirectory == null ? "dto" : "dto/" + currentDirectory;
+        PsiDirectory dtoDirectory = directoryMap.get(dir);
         String requestDTOName = "Save" + entityClass.getEntityName() + "RequestDTO";
         String requestDTODesc = entityClass.getEntityDescription() + "请求对象";
 
@@ -224,7 +238,8 @@ public class WondernectBaseLongCodeGenerator {
      * 创建ResponseDTO
      */
     private void createResponseDTO(EntityClass entityClass) {
-        PsiDirectory dtoDirectory = directoryMap.get("dto");
+        String dir = currentDirectory == null ? "dto" : "dto/" + currentDirectory;
+        PsiDirectory dtoDirectory = directoryMap.get(dir);
         String responseDTOName = entityClass.getEntityName() + "ResponseDTO";
         String responseDTODesc = entityClass.getEntityDescription() + "响应对象";
         ClassCreator.of(module).init(
@@ -252,7 +267,8 @@ public class WondernectBaseLongCodeGenerator {
      * 创建ListRequestDTO
      */
     private void createListRequestDTO(EntityClass entityClass) {
-        PsiDirectory dtoDirectory = directoryMap.get("dto");
+        String dir = currentDirectory == null ? "dto" : "dto/" + currentDirectory;
+        PsiDirectory dtoDirectory = directoryMap.get(dir);
         String listRequestDTOName = "List" + entityClass.getEntityName() + "RequestDTO";
         String listRequestDTODesc = entityClass.getEntityDescription() + "列表请求对象";
         ClassCreator.of(module).init(
@@ -284,7 +300,8 @@ public class WondernectBaseLongCodeGenerator {
      * 创建PageRequestDTO
      */
     private void createPageRequestDTO(EntityClass entityClass) {
-        PsiDirectory dtoDirectory = directoryMap.get("dto");
+        String dir = currentDirectory == null ? "dto" : "dto/" + currentDirectory;
+        PsiDirectory dtoDirectory = directoryMap.get(dir);
         String pageRequestDTOName = "Page" + entityClass.getEntityName() + "RequestDTO";
         String pageRequestDTODesc = entityClass.getEntityDescription() + "分页请求对象";
         ClassCreator.of(module).init(
@@ -317,7 +334,8 @@ public class WondernectBaseLongCodeGenerator {
      * 创建Service接口
      */
     private void createServiceInterface(EntityClass entityClass) {
-        PsiDirectory serviceInterfaceDirectory = directoryMap.get("service/impl");
+        String dir = currentDirectory == null ? "service" : "service/" + currentDirectory;
+        PsiDirectory serviceInterfaceDirectory = directoryMap.get(dir);
         String serviceInterfaceName = entityClass.getEntityName().concat("Interface");
         String content = getCommentContent(entityClass.getEntityDescription() + "服务接口类", entityClass.getAuthor()) +
                 "\npublic interface " + serviceInterfaceName + " {\n" +
@@ -361,7 +379,8 @@ public class WondernectBaseLongCodeGenerator {
      * 创建服务抽象类
      */
     private void createServiceAbstract(EntityClass entityClass) {
-        PsiDirectory serviceAbstractDirectory = directoryMap.get("service/impl");
+        String dir = currentDirectory == null ? "service" : "service/" + currentDirectory;
+        PsiDirectory serviceAbstractDirectory = directoryMap.get(dir);
         String serviceAbstractName = entityClass.getEntityName().concat("AbstractService");
         String content = getCommentContent(entityClass.getEntityDescription() + "服务抽象实现类", entityClass.getAuthor()) +
                 "\n@Service\npublic abstract class " + serviceAbstractName + " extends BaseLongService<" + entityClass.getResponseDTOName() + ", " + entityClass.getEntityName() + "> implements " + entityClass.getServiceInterfaceName() + "{\n" +
@@ -414,14 +433,12 @@ public class WondernectBaseLongCodeGenerator {
                         serviceAbstractName,
                         content
                 )
-                        .importClass(entityClass.getServiceInterfaceName())
                         .importClass(entityClass.getEntityName())
                         .importClass(entityClass.getRequestDTOName())
                         .importClass(entityClass.getResponseDTOName())
                         .importClass(entityClass.getListRequestDTOName())
                         .importClass(entityClass.getPageRequestDTOName())
                         .importClass("org.springframework.stereotype.Service")
-                        .importClass("org.springframework.beans.factory.annotation.Autowired")
                         .importClass("org.springframework.transaction.annotation.Transactional")
                         .importClass("java.util.List")
                         .importClass(baseLongServiceClass)
@@ -439,14 +456,14 @@ public class WondernectBaseLongCodeGenerator {
      * 创建服务实现类
      */
     private void createService(EntityClass entityClass) {
-        PsiDirectory serviceDirectory = directoryMap.get("service");
+        String dir = currentDirectory == null ? "service" : "service/" + currentDirectory;
+        PsiDirectory serviceDirectory = directoryMap.get(dir);
         String serviceName = entityClass.getEntityName().concat("Service");
         String content = getCommentContent(entityClass.getEntityDescription() + "服务", entityClass.getAuthor()) +
                 "\n@Service\npublic class " + serviceName + " extends " + entityClass.getServiceAbstractName() + "{\n" +
                 "\n}"
                 ;
         ClassCreator.of(module).init(serviceName, content)
-                .importClass(entityClass.getServiceAbstractName())
                 .importClass("org.springframework.stereotype.Service")
                 .addTo(serviceDirectory);
         entityClass.setServiceName(serviceName);
@@ -456,7 +473,8 @@ public class WondernectBaseLongCodeGenerator {
      * 创建接口
      */
     private void createController(EntityClass entityClass) {
-        PsiDirectory controllerDirectory = directoryMap.get("controller");
+        String dir = currentDirectory == null ? "controller" : "controller/" + currentDirectory;
+        PsiDirectory controllerDirectory = directoryMap.get(dir);
         String controllerName = entityClass.getEntityName().concat("Controller");
         String prefix = "/" + entityClass.getApiVersion() + "/" + entityClass.getApiService() + "/" + PsiStringUtils.toUnderLineStr(entityClass.getEntityName());
         String content = getCommentContent(entityClass.getEntityDescription() + "接口", entityClass.getAuthor()) +
@@ -598,7 +616,7 @@ public class WondernectBaseLongCodeGenerator {
                                 String lengthStr = str.substring(0, idx).replaceAll("\"", "");
                                 if (StringUtils.isNotBlank(lengthStr)) {
                                     int length = Integer.parseInt(lengthStr);
-                                    content = content + "\n@Length(max = " + length + ")";
+                                    content = content + "\n@Length(max = " + length + ", message = \"" + description + "长度不能超过" + length + "字符(1汉字=2字符)\")";
                                 }
                             }
                         }
