@@ -3,6 +3,7 @@ package com.wondernect.plugins.code.generator.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiFile;
+import com.wondernect.plugins.code.generator.WondernectBaseCodeGenerator;
 import com.wondernect.plugins.code.generator.WondernectBaseLongCodeGenerator;
 import com.wondernect.plugins.code.generator.WondernectBaseStringCodeGenerator;
 
@@ -17,7 +18,7 @@ import java.awt.*;
  * Description:
  */
 public class FormSwing {
-    // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel(ID为String); 3-BaseModel(ID为Long);
+    // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel
     private int baseModelType;
     private Project project;
     private PsiFile psiFile;
@@ -85,7 +86,7 @@ public class FormSwing {
                     service == null || "".equals(service.trim())) {
                 Messages.showMessageDialog(project, "任一信息不能为空", "ERROR", Messages.getErrorIcon());
             } else {
-                // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel(ID为String); 3-BaseModel(ID为Long);
+                // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel
                 switch (baseModelType) {
                     case 0:
                     {
@@ -101,12 +102,8 @@ public class FormSwing {
                     }
                     case 2:
                     {
-
-                        break;
-                    }
-                    case 3:
-                    {
-
+                        WondernectBaseCodeGenerator wondernectBaseCodeGenerator = new WondernectBaseCodeGenerator(project, psiFile, author, version, service);
+                        wondernectBaseCodeGenerator.generateCode();
                         break;
                     }
                     default:

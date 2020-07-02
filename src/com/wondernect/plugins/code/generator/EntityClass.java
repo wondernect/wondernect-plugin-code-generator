@@ -15,8 +15,11 @@ public class EntityClass {
     private PsiClass entityClass;
     private String entityName;
     private String entityVariableName;
-
     private String entityDescription;
+
+    private String entityIdType;
+    private String entityIdName;
+    private String entityIdVariableName;
 
     private String repositoryName;
     private String repositoryVariableName;
@@ -106,6 +109,27 @@ public class EntityClass {
 
     public void setEntityDescription(String entityDescription) {
         this.entityDescription = entityDescription;
+    }
+
+    public String getEntityIdType() {
+        return entityIdType;
+    }
+
+    public void setEntityIdType(String entityIdType) {
+        this.entityIdType = entityIdType;
+    }
+
+    public String getEntityIdName() {
+        return entityIdName;
+    }
+
+    public void setEntityIdName(String entityIdName) {
+        this.entityIdName = entityIdName;
+        this.entityIdVariableName = PsiStringUtils.firstLetterToLower(entityIdName);
+    }
+
+    public String getEntityIdVariableName() {
+        return entityIdVariableName;
     }
 
     public String getRepositoryName() {
