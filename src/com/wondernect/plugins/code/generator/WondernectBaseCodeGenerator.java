@@ -626,7 +626,7 @@ public class WondernectBaseCodeGenerator {
             if (descriptionOptional.isPresent()) {
                 description = descriptionOptional.get();
             } else {
-                descriptionOptional = psiUtils.getAnnotationValue(fieldAnnotation, "description");
+                descriptionOptional = psiUtils.getAnnotationValue(fieldAnnotation, "notes");
                 if (descriptionOptional.isPresent()) {
                     description = descriptionOptional.get();
                 }
@@ -691,7 +691,7 @@ public class WondernectBaseCodeGenerator {
             if (descriptionOptional.isPresent()) {
                 description = descriptionOptional.get();
             } else {
-                descriptionOptional = psiUtils.getAnnotationValue(fieldAnnotation, "description");
+                descriptionOptional = psiUtils.getAnnotationValue(fieldAnnotation, "notes");
                 if (descriptionOptional.isPresent()) {
                     description = descriptionOptional.get();
                 }
