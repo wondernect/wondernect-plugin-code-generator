@@ -5,6 +5,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiFile;
 import com.wondernect.plugins.code.generator.WondernectBaseCodeGenerator;
 import com.wondernect.plugins.code.generator.WondernectBaseLongCodeGenerator;
+import com.wondernect.plugins.code.generator.WondernectBaseRDBCodeGenerator;
 import com.wondernect.plugins.code.generator.WondernectBaseStringCodeGenerator;
 
 import javax.swing.*;
@@ -18,7 +19,7 @@ import java.awt.*;
  * Description:
  */
 public class FormSwing {
-    // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel
+    // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel; 3-BaseRDBModel;
     private int baseModelType;
     private Project project;
     private PsiFile psiFile;
@@ -86,7 +87,7 @@ public class FormSwing {
                     service == null || "".equals(service.trim())) {
                 Messages.showMessageDialog(project, "任一信息不能为空", "ERROR", Messages.getErrorIcon());
             } else {
-                // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel
+                // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel; 3-BaseRDBModel;
                 switch (baseModelType) {
                     case 0:
                     {
@@ -104,6 +105,12 @@ public class FormSwing {
                     {
                         WondernectBaseCodeGenerator wondernectBaseCodeGenerator = new WondernectBaseCodeGenerator(project, psiFile, author, version, service);
                         wondernectBaseCodeGenerator.generateCode();
+                        break;
+                    }
+                    case 3:
+                    {
+                        WondernectBaseRDBCodeGenerator wondernectBaseRDBCodeGenerator = new WondernectBaseRDBCodeGenerator(project, psiFile, author, version, service);
+                        wondernectBaseRDBCodeGenerator.generateCode();
                         break;
                     }
                     default:

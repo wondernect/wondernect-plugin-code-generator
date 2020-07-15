@@ -10,6 +10,8 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      添加BaseRDBModel继承对象代码自动生成菜单.<br>
+      <em>1.4</em><br>
       添加BaseModel继承对象代码自动生成菜单.<br>
       <em>1.3</em><br>
       按照model下entity实体所在目录在对应文件夹下生成对应目录.<br>
@@ -35,6 +37,9 @@
 
   <actions>
     <!-- Add your actions here -->
+    <action id="com.wondernect.stars.BaseRDBCodeGeneratorAction" class="com.wondernect.plugins.code.generator.BaseRDBCodeGeneratorAction" text="BaseRDBModelGenerate" description="继承BaseRDBModel实体类代码生成菜单">
+      <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+    </action>
     <action id="com.wondernect.stars.BaseCodeGeneratorAction" class="com.wondernect.plugins.code.generator.BaseCodeGeneratorAction" text="BaseModelGenerate" description="继承BaseModel实体类代码生成菜单">
       <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
     </action>
