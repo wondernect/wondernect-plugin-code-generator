@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.wondernect.plugin.code-generator</id>
   <name>Wondernect Code Generator</name>
-  <version>1.3</version>
+  <version>1.5</version>
   <vendor email="sunbeamhome@163.com" url="http://plugins.wondernect.com">WondernectPlugin</vendor>
 
   <description><![CDATA[
