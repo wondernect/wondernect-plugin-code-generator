@@ -448,24 +448,12 @@ public class WondernectBaseRDBCodeGenerator {
 
                 "\n@Override" +
                 "\npublic List<ESExcelItem> excelItemList() {" +
-                "\nreturn ESExcelUtils.getAllEntityExcelItem(" + entityClass.getResponseDTOName() + ".class);" +
+                "\nreturn super.excelItemList(" + entityClass.getResponseDTOName() + ".class);" +
                 "\n}" +
 
                 "\n@Override" +
                 "\npublic void excelDataExport(" + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() + ", HttpServletRequest request, HttpServletResponse response) {" +
-                "\nList<" + entityClass.getResponseDTOName() + "> " + entityClass.getResponseDTOVariableName() + "List" + " = list(" + entityClass.getListRequestDTOVariableName() + ");" +
-                "\nList<ESExcelItem> excelItemList = ESExcelUtils.getAllEntityExcelItem(" + entityClass.getResponseDTOName() + ".class);" +
-                "\nList<ExcelExportEntity> titleList = new ArrayList<>();" +
-                "\nif (CollectionUtils.isNotEmpty(excelItemList)) {" +
-                "\nfor (ESExcelItem excelItem : excelItemList) {" +
-                "\nexcelItem = excelItemHandle(excelItem);" +
-                "\nif (!excelItem.getHidden()) {" +
-                "\ntitleList.add(ESExcelUtils.generateExcelExportEntity(excelItem.getTitle(), excelItem.getName(), excelItem.getOrderNum()));" +
-                "\n}" +
-                "\n}" +
-                "\n}" +
-                "\nList<Map<String, Object>> dataList = ESExcelUtils.getEntityDataList(" + entityClass.getResponseDTOVariableName() + "List, excelItemList);" +
-                "\nEasyExcel.exportExcel(titleList, dataList, \"" + excelExportName + "\", \"" + excelExportName + "\", \"" + excelExportName + "\", request, response);" +
+                "\nsuper.excelDataExport(excelItemList(), list(" + entityClass.getListRequestDTOVariableName() + "), \"" + excelExportName + "\", \"" + excelExportName + "\", \"" + excelExportName + "\", request, response);" +
                 "\n}" +
 
                 "\n@Override" +
@@ -473,11 +461,6 @@ public class WondernectBaseRDBCodeGenerator {
                 "\n" + entityClass.getResponseDTOName() + " " + entityClass.getResponseDTOVariableName() + " = new " + entityClass.getResponseDTOName() + "();" +
                 "\nESBeanUtils.copyProperties(" + entityClass.getEntityVariableName() + ", " + entityClass.getResponseDTOVariableName() + ");" +
                 "\nreturn " + entityClass.getResponseDTOVariableName() + ";" +
-                "\n}" +
-
-                "\n@Override" +
-                "\npublic ESExcelItem excelItemHandle(ESExcelItem excelItem) {" +
-                "\nreturn excelItem;" +
                 "\n}" +
 
                 "\n}"
@@ -504,10 +487,8 @@ public class WondernectBaseRDBCodeGenerator {
                         .importClass("com.wondernect.elements.common.utils.ESBeanUtils")
                         .importClass("com.wondernect.elements.common.utils.ESObjectUtils")
                         .importClass("com.wondernect.elements.common.exception.BusinessException")
-                        .importClass("com.wondernect.elements.easyoffice.excel.EasyExcel")
                         .importClass("com.wondernect.elements.easyoffice.excel.ESExcelItem")
                         .importClass("com.wondernect.elements.easyoffice.excel.ESExcelUtils")
-                        .importClass("cn.afterturn.easypoi.excel.entity.params.ExcelExportEntity")
                         .importClass("org.apache.commons.collections4.CollectionUtils")
                         .importClass("javax.servlet.http.HttpServletRequest")
                         .importClass("javax.servlet.http.HttpServletResponse")
