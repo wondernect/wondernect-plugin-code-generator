@@ -455,8 +455,7 @@ public class WondernectBaseLongCodeGenerator {
                 "\nList<ExcelExportEntity> titleList = new ArrayList<>();" +
                 "\nif (CollectionUtils.isNotEmpty(excelItemList)) {" +
                 "\nfor (ESExcelItem excelItem : excelItemList) {" +
-                "\n//TODO:添加excel列名展示配置" +
-                "\n" +
+                "\nexcelItem = excelItemHandle(excelItem);" +
                 "\nif (!excelItem.getHidden()) {" +
                 "\ntitleList.add(ESExcelUtils.generateExcelExportEntity(excelItem.getTitle(), excelItem.getName(), excelItem.getOrderNum()));" +
                 "\n}" +
@@ -472,6 +471,11 @@ public class WondernectBaseLongCodeGenerator {
                 "\nESBeanUtils.copyProperties(" + entityClass.getEntityVariableName() + ", " + entityClass.getResponseDTOVariableName() + ");" +
                 "\n" + entityClass.getResponseDTOVariableName() + ".setId(" + entityClass.getEntityVariableName() + ".getId());" +
                 "\nreturn " + entityClass.getResponseDTOVariableName() + ";" +
+                "\n}" +
+
+                "\n@Override" +
+                "\npublic ESExcelItem excelItemHandle(ESExcelItem excelItem) {" +
+                "\nreturn excelItem;" +
                 "\n}" +
 
                 "\n}"

@@ -10,6 +10,8 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      添加excel导出接口自动生成.<br>
+      <em>1.5</em><br>
       添加BaseRDBModel继承对象代码自动生成菜单.<br>
       <em>1.4</em><br>
       添加BaseModel继承对象代码自动生成菜单.<br>
