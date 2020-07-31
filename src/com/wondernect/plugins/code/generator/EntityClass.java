@@ -3,6 +3,9 @@ package com.wondernect.plugins.code.generator;
 import com.intellij.psi.PsiClass;
 import com.wondernect.plugins.code.generator.util.PsiStringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 全局配置实体类
  */
@@ -35,6 +38,8 @@ public class EntityClass {
 
     private String responseDTOName;
     private String responseDTOVariableName;
+    private Map<String, String> responseFields = new HashMap<>();
+    private Map<String, String> responseFieldsDescription = new HashMap<>();
 
     private String listRequestDTOName;
     private String listRequestDTOVariableName;
@@ -195,6 +200,22 @@ public class EntityClass {
 
     public String getResponseDTOVariableName() {
         return responseDTOVariableName;
+    }
+
+    public Map<String, String> getResponseFields() {
+        return responseFields;
+    }
+
+    public void setResponseFields(Map<String, String> responseFields) {
+        this.responseFields = responseFields;
+    }
+
+    public Map<String, String> getResponseFieldsDescription() {
+        return responseFieldsDescription;
+    }
+
+    public void setResponseFieldsDescription(Map<String, String> responseFieldsDescription) {
+        this.responseFieldsDescription = responseFieldsDescription;
     }
 
     public String getListRequestDTOName() {

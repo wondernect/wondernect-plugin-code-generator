@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.wondernect.plugin.code-generator</id>
   <name>Wondernect Code Generator</name>
-  <version>1.5</version>
+  <version>1.6</version>
   <vendor email="sunbeamhome@163.com" url="http://plugins.wondernect.com">WondernectPlugin</vendor>
 
   <description><![CDATA[
@@ -10,6 +10,8 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      excel response item handler自动生成.<br>
+      <em>1.6</em><br>
       添加excel导出接口自动生成.<br>
       <em>1.5</em><br>
       添加BaseRDBModel继承对象代码自动生成菜单.<br>

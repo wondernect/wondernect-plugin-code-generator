@@ -98,6 +98,8 @@ public class WondernectBaseLongCodeGenerator {
         WriteCommandAction.runWriteCommandAction(project, () -> createRequestDTO(entityClass));
         // 创建responseDTO
         WriteCommandAction.runWriteCommandAction(project, () -> createResponseDTO(entityClass));
+        // 创建excel item handler
+        WriteCommandAction.runWriteCommandAction(project, () -> createExcelExportItemHandler(entityClass));
         // 创建listRequestDTO
         WriteCommandAction.runWriteCommandAction(project, () -> createListRequestDTO(entityClass));
         // 创建pageRequestDTO
@@ -116,7 +118,7 @@ public class WondernectBaseLongCodeGenerator {
      * 初始化所有文件夹
      */
     private void initDirs() {
-        List<String> directories = Arrays.asList("repository", "dao", "manager", "dto", "service", "controller");
+        List<String> directories = Arrays.asList("repository", "dao", "manager", "dto", "service", "controller", "excel_export");
         directoryMap.clear();
         directories.forEach(dir -> {
             // 创建1级目录
@@ -264,6 +266,57 @@ public class WondernectBaseLongCodeGenerator {
     }
 
     /**
+     * 创建excel export item handler
+     */
+    private void createExcelExportItemHandler(EntityClass entityClass) {
+        String dir = currentDirectory == null ? "excel_export" : "excel_export/" + currentDirectory;
+        PsiDirectory excelExportItemDirectory = directoryMap.get(dir);
+        if (entityClass.getResponseFields() != null && entityClass.getResponseFields().size() > 0) {
+            for (String itemName : entityClass.getResponseFields().keySet()) {
+                String itemType = entityClass.getResponseFields().get(itemName);
+                String description = entityClass.getResponseFieldsDescription().get(itemName);
+                String excelExportItemHandlerName = entityClass.getEntityName() + PsiStringUtils.firstLetterToUpper(itemName) + "ExcelExportItemHandler";
+                ClassCreator.of(module).init(
+                        excelExportItemHandlerName,
+                        getCommentContent(description + "导出item handler", entityClass.getAuthor()) +
+                                "\n@Service" +
+                                "\npublic class " + excelExportItemHandlerName + " implements ESExcelItemHandler<" + itemType + "> {\n" +
+
+                                "\n@Override" +
+                                "\npublic String itemName() {" +
+                                "\nreturn \"" + itemName + "\";" +
+                                "}" +
+
+                                "\n@Override" +
+                                "\npublic String itemTitle() {" +
+                                "\nreturn \"" + description + "\";" +
+                                "}" +
+
+                                "\n@Override" +
+                                "\npublic int itemOrder() {" +
+                                "\nreturn 0;" +
+                                "}" +
+
+                                "\n@Override" +
+                                "\npublic Boolean hidden() {" +
+                                "\nreturn false;" +
+                                "}" +
+
+                                "\n@Override" +
+                                "\npublic Object handleExcelExportItemObject(" + itemType + " object) {" +
+                                "\nreturn object;" +
+                                "}" +
+
+                                "}"
+                )
+                        .importClass("com.wondernect.elements.easyoffice.excel.ESExcelItemHandler")
+                        .importClass("org.springframework.stereotype.Service")
+                        .addTo(excelExportItemDirectory);
+            }
+        }
+    }
+
+    /**
      * 创建ListRequestDTO
      */
     private void createListRequestDTO(EntityClass entityClass) {
@@ -378,7 +431,7 @@ public class WondernectBaseLongCodeGenerator {
                 "\n/** " +
                 "\n * excel导出" +
                 "\n**/" +
-                "\nvoid excelDataExport(" + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() + ", HttpServletRequest request, HttpServletResponse response); " +
+                "\nvoid excelDataExport(String exportServiceIdentifier, " + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() + ", HttpServletRequest request, HttpServletResponse response); " +
 
                 "\n}";
         ClassCreator.of(module).init(serviceInterfaceName, content)
@@ -449,8 +502,8 @@ public class WondernectBaseLongCodeGenerator {
                 "\n}" +
 
                 "\n@Override" +
-                "\npublic void excelDataExport(" + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() + ", HttpServletRequest request, HttpServletResponse response) {" +
-                "\nsuper.excelDataExport(excelItemList(), list(" + entityClass.getListRequestDTOVariableName() + "), \"" + excelExportName + "\", \"" + excelExportName + "\", \"" + excelExportName + "\", request, response);" +
+                "\npublic void excelDataExport(String exportServiceIdentifier, " + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() + ", HttpServletRequest request, HttpServletResponse response) {" +
+                "\nsuper.excelDataExport(exportServiceIdentifier, excelItemList(), list(" + entityClass.getListRequestDTOVariableName() + "), \"" + excelExportName + "\", \"" + excelExportName + "\", \"" + excelExportName + "\", request, response);" +
                 "\n}" +
 
                 "\n@Override" +
@@ -459,6 +512,20 @@ public class WondernectBaseLongCodeGenerator {
                 "\nESBeanUtils.copyProperties(" + entityClass.getEntityVariableName() + ", " + entityClass.getResponseDTOVariableName() + ");" +
                 "\n" + entityClass.getResponseDTOVariableName() + ".setId(" + entityClass.getEntityVariableName() + ".getId());" +
                 "\nreturn " + entityClass.getResponseDTOVariableName() + ";" +
+                "\n}" +
+
+                "\n@Override" +
+                "\npublic List<ESExcelItemHandler> generateExcelExportItemHandlerList(String exportServiceIdentifier) {" +
+                "\nswitch (exportServiceIdentifier) {" +
+                "\ncase \"all\":" +
+                "\n{" +
+                "\nreturn Arrays.asList(xxxHandler1, xxxHandler2, xxxHandler3);" +
+                "\n}" +
+                "\ndefault:" +
+                "\n{" +
+                "\nreturn new ArrayList<>();" +
+                "\n}" +
+                "\n}" +
                 "\n}" +
 
                 "\n}"
@@ -479,6 +546,7 @@ public class WondernectBaseLongCodeGenerator {
                         .importClass("java.util.Map")
                         .importClass("java.util.List")
                         .importClass("java.util.ArrayList")
+                        .importClass("java.util.Arrays")
                         .importClass(baseLongServiceClass)
                         .importClass("com.wondernect.elements.rdb.criteria.Criteria")
                         .importClass("com.wondernect.elements.rdb.response.PageResponseData")
@@ -487,6 +555,7 @@ public class WondernectBaseLongCodeGenerator {
                         .importClass("com.wondernect.elements.common.exception.BusinessException")
                         .importClass("com.wondernect.elements.easyoffice.excel.ESExcelItem")
                         .importClass("com.wondernect.elements.easyoffice.excel.ESExcelUtils")
+                        .importClass("com.wondernect.elements.easyoffice.excel.ESExcelItemHandler")
                         .importClass("org.apache.commons.collections4.CollectionUtils")
                         .importClass("javax.servlet.http.HttpServletRequest")
                         .importClass("javax.servlet.http.HttpServletResponse")
@@ -579,11 +648,12 @@ public class WondernectBaseLongCodeGenerator {
 
                 "\n@ApiOperation(value = \"excel导出\", httpMethod = \"POST\")\n@PostMapping(value = \"/excel_data_export\")" +
                 "\npublic void excelDataExport(" +
+                "\n@ApiParam(required = true) @NotBlank(message = \"excel导出服务id不能为空\") @RequestParam(value = \"export_service_identifier\", required = false) String exportServiceIdentifier," +
                 "\n@ApiParam(required = true) @NotNull(message = \"列表请求参数不能为空\") @Validated @RequestBody(required = false) " + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() + "," +
                 "\nHttpServletRequest request," +
                 "\nHttpServletResponse response" +
                 "\n) {" +
-                "\n" + entityClass.getServiceVariableName() + ".excelDataExport(" + entityClass.getListRequestDTOVariableName() +", request, response);" +
+                "\n" + entityClass.getServiceVariableName() + ".excelDataExport(exportServiceIdentifier, " + entityClass.getListRequestDTOVariableName() +", request, response);" +
                 "\n}" +
 
                 "\n}"
@@ -709,6 +779,8 @@ public class WondernectBaseLongCodeGenerator {
         content = content + "\n@JsonProperty(\"id\")";
         content = content + "\n@ApiModelProperty(notes = \"" + entityClass.getEntityDescription() + "id\")";
         content = content + "\nprivate Long id;\n";
+        entityClass.getResponseFields().put("id", "String");
+        entityClass.getResponseFieldsDescription().put("id", entityClass.getEntityDescription() + "id");
         for (PsiField field : entityClass.getEntityClass().getFields()) {
             String name = field.getName();
             PsiType type = field.getType();
@@ -739,6 +811,8 @@ public class WondernectBaseLongCodeGenerator {
             content = content + "\n@JsonProperty(\"" + PsiStringUtils.toUnderLineStr(name) + "\")";
             content = content + "\n@ApiModelProperty(notes = \"" + description + "\")";
             content = content + "\nprivate " + typeName + " " + name + ";\n";
+            entityClass.getResponseFields().put(name, typeName);
+            entityClass.getResponseFieldsDescription().put(name, description);
         }
         return content;
     }

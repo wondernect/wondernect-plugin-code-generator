@@ -7,6 +7,13 @@ import java.util.Objects;
 
 public final class PsiStringUtils {
 
+    public static String firstLetterToUpper(String str) {
+        if (StringUtils.isBlank(str)) {
+            return "";
+        }
+        return str.replaceFirst(str.substring(0, 1), str.substring(0, 1).toUpperCase());
+    }
+
     public static String firstLetterToLower(String str) {
         if (StringUtils.isBlank(str)) {
             return "";
