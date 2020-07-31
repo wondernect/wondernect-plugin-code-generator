@@ -77,7 +77,9 @@ public class WondernectBaseStringCodeGenerator {
         assert apiModelAnnotation != null;
         Optional<String> descriptionOptional = psiUtils.getAnnotationValue(apiModelAnnotation, "value");
         String description = null;
-        if (descriptionOptional.isPresent()) {
+        if (descriptionOptional.isPresent() &&
+                !"".equals(descriptionOptional.get()) &&
+                !"\"\"".equals(descriptionOptional.get())) {
             description = descriptionOptional.get();
         } else {
             descriptionOptional = psiUtils.getAnnotationValue(apiModelAnnotation, "description");
@@ -99,7 +101,7 @@ public class WondernectBaseStringCodeGenerator {
         // 创建responseDTO
         WriteCommandAction.runWriteCommandAction(project, () -> createResponseDTO(entityClass));
         // 创建excel item handler
-        WriteCommandAction.runWriteCommandAction(project, () -> createExcelExportItemHandler(entityClass));
+        // WriteCommandAction.runWriteCommandAction(project, () -> createExcelExportItemHandler(entityClass));
         // 创建listRequestDTO
         WriteCommandAction.runWriteCommandAction(project, () -> createListRequestDTO(entityClass));
         // 创建pageRequestDTO
@@ -118,7 +120,8 @@ public class WondernectBaseStringCodeGenerator {
      * 初始化所有文件夹
      */
     private void initDirs() {
-        List<String> directories = Arrays.asList("repository", "dao", "manager", "dto", "service", "controller", "excel_export");
+        // List<String> directories = Arrays.asList("repository", "dao", "manager", "dto", "service", "controller", "excel_export");
+        List<String> directories = Arrays.asList("repository", "dao", "manager", "dto", "service", "controller");
         directoryMap.clear();
         directories.forEach(dir -> {
             // 创建1级目录
@@ -275,7 +278,7 @@ public class WondernectBaseStringCodeGenerator {
             for (String itemName : entityClass.getResponseFields().keySet()) {
                 String itemType = entityClass.getResponseFields().get(itemName);
                 String description = entityClass.getResponseFieldsDescription().get(itemName);
-                String excelExportItemHandlerName = entityClass.getEntityName() + PsiStringUtils.firstLetterToUpper(itemName) + "ExcelExportItemHandler";
+                String excelExportItemHandlerName = entityClass.getResponseDTOName() + PsiStringUtils.firstLetterToUpper(itemName) + "ExportHandler";
                 ClassCreator.of(module).init(
                         excelExportItemHandlerName,
                         getCommentContent(description + "导出item handler", entityClass.getAuthor()) +
@@ -517,10 +520,6 @@ public class WondernectBaseStringCodeGenerator {
                 "\n@Override" +
                 "\npublic List<ESExcelItemHandler> generateExcelExportItemHandlerList(String exportServiceIdentifier) {" +
                 "\nswitch (exportServiceIdentifier) {" +
-                "\ncase \"all\":" +
-                "\n{" +
-                "\nreturn Arrays.asList(xxxHandler1, xxxHandler2, xxxHandler3);" +
-                "\n}" +
                 "\ndefault:" +
                 "\n{" +
                 "\nreturn new ArrayList<>();" +
@@ -546,7 +545,6 @@ public class WondernectBaseStringCodeGenerator {
                         .importClass("java.util.Map")
                         .importClass("java.util.List")
                         .importClass("java.util.ArrayList")
-                        .importClass("java.util.Arrays")
                         .importClass(baseStringServiceClass)
                         .importClass("com.wondernect.elements.rdb.criteria.Criteria")
                         .importClass("com.wondernect.elements.rdb.response.PageResponseData")
@@ -722,7 +720,9 @@ public class WondernectBaseStringCodeGenerator {
             PsiAnnotation fieldAnnotation = field.getAnnotation("io.swagger.annotations.ApiModelProperty");
             Optional<String> descriptionOptional = psiUtils.getAnnotationValue(fieldAnnotation, "value");
             String description = null;
-            if (descriptionOptional.isPresent()) {
+            if (descriptionOptional.isPresent() &&
+                    !"".equals(descriptionOptional.get()) &&
+                    !"\"\"".equals(descriptionOptional.get())) {
                 description = descriptionOptional.get();
             } else {
                 descriptionOptional = psiUtils.getAnnotationValue(fieldAnnotation, "notes");
@@ -792,7 +792,9 @@ public class WondernectBaseStringCodeGenerator {
             PsiAnnotation fieldAnnotation = field.getAnnotation("io.swagger.annotations.ApiModelProperty");
             Optional<String> descriptionOptional = psiUtils.getAnnotationValue(fieldAnnotation, "value");
             String description = null;
-            if (descriptionOptional.isPresent()) {
+            if (descriptionOptional.isPresent() &&
+                    !"".equals(descriptionOptional.get()) &&
+                    !"\"\"".equals(descriptionOptional.get())) {
                 description = descriptionOptional.get();
             } else {
                 descriptionOptional = psiUtils.getAnnotationValue(fieldAnnotation, "notes");

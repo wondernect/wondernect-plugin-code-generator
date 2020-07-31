@@ -3,10 +3,7 @@ package com.wondernect.plugins.code.generator.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiFile;
-import com.wondernect.plugins.code.generator.WondernectBaseCodeGenerator;
-import com.wondernect.plugins.code.generator.WondernectBaseLongCodeGenerator;
-import com.wondernect.plugins.code.generator.WondernectBaseRDBCodeGenerator;
-import com.wondernect.plugins.code.generator.WondernectBaseStringCodeGenerator;
+import com.wondernect.plugins.code.generator.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +16,7 @@ import java.awt.*;
  * Description:
  */
 public class FormSwing {
-    // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel; 3-BaseRDBModel;
+    // 0-BaseStringModel; 1-BaseLongModel; 2-BaseModel; 3-BaseRDBModel; 4-ExcelItemHandler;
     private int baseModelType;
     private Project project;
     private PsiFile psiFile;
@@ -111,6 +108,12 @@ public class FormSwing {
                     {
                         WondernectBaseRDBCodeGenerator wondernectBaseRDBCodeGenerator = new WondernectBaseRDBCodeGenerator(project, psiFile, author, version, service);
                         wondernectBaseRDBCodeGenerator.generateCode();
+                        break;
+                    }
+                    case 4:
+                    {
+                        WondernectExcelExportItemHandlerCodeGenerator wondernectExcelExportItemHandlerCodeGenerator = new WondernectExcelExportItemHandlerCodeGenerator(project, psiFile, author, version, service);
+                        wondernectExcelExportItemHandlerCodeGenerator.generateCode();
                         break;
                     }
                     default:
