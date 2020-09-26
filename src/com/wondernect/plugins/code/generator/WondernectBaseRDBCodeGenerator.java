@@ -257,7 +257,7 @@ public class WondernectBaseRDBCodeGenerator {
                         "\n@NoArgsConstructor" +
                         "\n@AllArgsConstructor" +
                         "\n@ApiModel(value = \""+ responseDTODesc +"\")" +
-                        "\npublic class " + responseDTOName + " {" +
+                        "\npublic class " + responseDTOName + " extends BaseRDBResponseDTO {" +
                         "\n" + getFieldsContentForRESDTO(entityClass) +
                         "}"
         )
@@ -267,6 +267,7 @@ public class WondernectBaseRDBCodeGenerator {
                 .importClass("io.swagger.annotations.ApiModel")
                 .importClass("io.swagger.annotations.ApiModelProperty")
                 .importClass("com.fasterxml.jackson.annotation.JsonProperty")
+                .importClass("com.wondernect.elements.rdb.response.BaseRDBResponseDTO")
                 .addTo(dtoDirectory);
         entityClass.setResponseDTOName(responseDTOName);
     }
@@ -337,10 +338,7 @@ public class WondernectBaseRDBCodeGenerator {
                         "\n@NoArgsConstructor" +
                         "\n@AllArgsConstructor" +
                         "\n@ApiModel(value = \""+ listRequestDTODesc +"\")" +
-                        "\npublic class " + listRequestDTOName + " {\n" +
-                        "\n@JsonProperty(\"sort_data_list\")" +
-                        "\n@ApiModelProperty(notes = \"列表请求参数\")" +
-                        "\nprivate List<SortData> sortDataList;" +
+                        "\npublic class " + listRequestDTOName + " extends ListRequestDTO {\n" +
                         "\n}"
         )
                 .importClass("lombok.Data")
@@ -349,8 +347,7 @@ public class WondernectBaseRDBCodeGenerator {
                 .importClass("io.swagger.annotations.ApiModel")
                 .importClass("io.swagger.annotations.ApiModelProperty")
                 .importClass("com.fasterxml.jackson.annotation.JsonProperty")
-                .importClass("com.wondernect.elements.rdb.request.SortData")
-                .importClass("java.util.List")
+                .importClass("com.wondernect.elements.rdb.request.ListRequestDTO")
                 .addTo(dtoDirectory);
         entityClass.setListRequestDTOName(listRequestDTOName);
     }
@@ -370,11 +367,7 @@ public class WondernectBaseRDBCodeGenerator {
                         "\n@NoArgsConstructor" +
                         "\n@AllArgsConstructor" +
                         "\n@ApiModel(value = \""+ pageRequestDTODesc +"\")" +
-                        "\npublic class " + pageRequestDTOName + " {\n" +
-                        "\n@NotNull(message = \"分页请求参数不能为空\")" +
-                        "\n@JsonProperty(\"page_request_data\")" +
-                        "\n@ApiModelProperty(notes = \"分页请求参数\")" +
-                        "\nprivate PageRequestData pageRequestData;" +
+                        "\npublic class " + pageRequestDTOName + " extends PageRequestDTO {\n" +
                         "\n}"
         )
                 .importClass("lombok.Data")
@@ -383,8 +376,7 @@ public class WondernectBaseRDBCodeGenerator {
                 .importClass("io.swagger.annotations.ApiModel")
                 .importClass("io.swagger.annotations.ApiModelProperty")
                 .importClass("com.fasterxml.jackson.annotation.JsonProperty")
-                .importClass("com.wondernect.elements.rdb.request.PageRequestData")
-                .importClass("javax.validation.constraints.NotNull")
+                .importClass("com.wondernect.elements.rdb.request.PageRequestDTO")
                 .addTo(dtoDirectory);
         entityClass.setPageRequestDTOName(pageRequestDTOName);
     }

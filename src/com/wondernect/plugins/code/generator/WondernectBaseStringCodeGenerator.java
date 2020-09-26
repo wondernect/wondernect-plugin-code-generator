@@ -254,7 +254,7 @@ public class WondernectBaseStringCodeGenerator {
                         "\n@NoArgsConstructor" +
                         "\n@AllArgsConstructor" +
                         "\n@ApiModel(value = \""+ responseDTODesc +"\")" +
-                        "\npublic class " + responseDTOName + " {" +
+                        "\npublic class " + responseDTOName + " extends BaseStringResponseDTO {" +
                         "\n" + getFieldsContentForRESDTO(entityClass) +
                         "}"
         )
@@ -264,6 +264,7 @@ public class WondernectBaseStringCodeGenerator {
                 .importClass("io.swagger.annotations.ApiModel")
                 .importClass("io.swagger.annotations.ApiModelProperty")
                 .importClass("com.fasterxml.jackson.annotation.JsonProperty")
+                .importClass("com.wondernect.elements.rdb.response.BaseStringResponseDTO")
                 .addTo(dtoDirectory);
         entityClass.setResponseDTOName(responseDTOName);
     }
@@ -334,10 +335,7 @@ public class WondernectBaseStringCodeGenerator {
                         "\n@NoArgsConstructor" +
                         "\n@AllArgsConstructor" +
                         "\n@ApiModel(value = \""+ listRequestDTODesc +"\")" +
-                        "\npublic class " + listRequestDTOName + " {\n" +
-                        "\n@JsonProperty(\"sort_data_list\")" +
-                        "\n@ApiModelProperty(notes = \"列表请求参数\")" +
-                        "\nprivate List<SortData> sortDataList;" +
+                        "\npublic class " + listRequestDTOName + " extends ListRequestDTO {\n" +
                         "\n}"
         )
                 .importClass("lombok.Data")
@@ -346,8 +344,7 @@ public class WondernectBaseStringCodeGenerator {
                 .importClass("io.swagger.annotations.ApiModel")
                 .importClass("io.swagger.annotations.ApiModelProperty")
                 .importClass("com.fasterxml.jackson.annotation.JsonProperty")
-                .importClass("com.wondernect.elements.rdb.request.SortData")
-                .importClass("java.util.List")
+                .importClass("com.wondernect.elements.rdb.request.ListRequestDTO")
                 .addTo(dtoDirectory);
         entityClass.setListRequestDTOName(listRequestDTOName);
     }
@@ -367,11 +364,7 @@ public class WondernectBaseStringCodeGenerator {
                         "\n@NoArgsConstructor" +
                         "\n@AllArgsConstructor" +
                         "\n@ApiModel(value = \""+ pageRequestDTODesc +"\")" +
-                        "\npublic class " + pageRequestDTOName + " {\n" +
-                        "\n@NotNull(message = \"分页请求参数不能为空\")" +
-                        "\n@JsonProperty(\"page_request_data\")" +
-                        "\n@ApiModelProperty(notes = \"分页请求参数\")" +
-                        "\nprivate PageRequestData pageRequestData;" +
+                        "\npublic class " + pageRequestDTOName + " extends PageRequestDTO {\n" +
                         "\n}"
         )
                 .importClass("lombok.Data")
@@ -380,8 +373,7 @@ public class WondernectBaseStringCodeGenerator {
                 .importClass("io.swagger.annotations.ApiModel")
                 .importClass("io.swagger.annotations.ApiModelProperty")
                 .importClass("com.fasterxml.jackson.annotation.JsonProperty")
-                .importClass("com.wondernect.elements.rdb.request.PageRequestData")
-                .importClass("javax.validation.constraints.NotNull")
+                .importClass("com.wondernect.elements.rdb.request.PageRequestDTO")
                 .addTo(dtoDirectory);
         entityClass.setPageRequestDTOName(pageRequestDTOName);
     }
@@ -513,7 +505,6 @@ public class WondernectBaseStringCodeGenerator {
                 "\npublic " + entityClass.getResponseDTOName() + " generate(" + entityClass.getEntityName() + " " + entityClass.getEntityVariableName() + ") {" +
                 "\n" + entityClass.getResponseDTOName() + " " + entityClass.getResponseDTOVariableName() + " = new " + entityClass.getResponseDTOName() + "();" +
                 "\nESBeanUtils.copyProperties(" + entityClass.getEntityVariableName() + ", " + entityClass.getResponseDTOVariableName() + ");" +
-                "\n" + entityClass.getResponseDTOVariableName() + ".setId(" + entityClass.getEntityVariableName() + ".getId());" +
                 "\nreturn " + entityClass.getResponseDTOVariableName() + ";" +
                 "\n}" +
 
@@ -776,11 +767,11 @@ public class WondernectBaseStringCodeGenerator {
 
     private String getFieldsContentForRESDTO(EntityClass entityClass) {
         String content = "";
-        content = content + "\n@JsonProperty(\"id\")";
-        content = content + "\n@ApiModelProperty(notes = \"" + entityClass.getEntityDescription() + "id\")";
-        content = content + "\nprivate String id;\n";
-        entityClass.getResponseFields().put("id", "String");
-        entityClass.getResponseFieldsDescription().put("id", entityClass.getEntityDescription() + "id");
+        // content = content + "\n@JsonProperty(\"id\")";
+        // content = content + "\n@ApiModelProperty(notes = \"" + entityClass.getEntityDescription() + "id\")";
+        // content = content + "\nprivate String id;\n";
+        // entityClass.getResponseFields().put("id", "String");
+        // entityClass.getResponseFieldsDescription().put("id", entityClass.getEntityDescription() + "id");
         for (PsiField field : entityClass.getEntityClass().getFields()) {
             String name = field.getName();
             PsiType type = field.getType();
