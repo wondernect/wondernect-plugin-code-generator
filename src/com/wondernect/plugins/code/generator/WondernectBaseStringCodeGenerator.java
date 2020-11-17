@@ -333,14 +333,12 @@ public class WondernectBaseStringCodeGenerator {
                 getCommentContent(entityClass.getEntityDescription() + "列表请求DTO", entityClass.getAuthor()) +
                         "\n@Data" +
                         "\n@NoArgsConstructor" +
-                        "\n@AllArgsConstructor" +
                         "\n@ApiModel(value = \""+ listRequestDTODesc +"\")" +
                         "\npublic class " + listRequestDTOName + " extends ListRequestDTO {\n" +
                         "\n}"
         )
                 .importClass("lombok.Data")
                 .importClass("lombok.NoArgsConstructor")
-                .importClass("lombok.AllArgsConstructor")
                 .importClass("io.swagger.annotations.ApiModel")
                 .importClass("com.wondernect.elements.rdb.request.ListRequestDTO")
                 .addTo(dtoDirectory);
@@ -360,14 +358,12 @@ public class WondernectBaseStringCodeGenerator {
                 getCommentContent(entityClass.getEntityDescription() + "分页请求DTO", entityClass.getAuthor()) +
                         "\n@Data" +
                         "\n@NoArgsConstructor" +
-                        "\n@AllArgsConstructor" +
                         "\n@ApiModel(value = \""+ pageRequestDTODesc +"\")" +
                         "\npublic class " + pageRequestDTOName + " extends PageRequestDTO {\n" +
                         "\n}"
         )
                 .importClass("lombok.Data")
                 .importClass("lombok.NoArgsConstructor")
-                .importClass("lombok.AllArgsConstructor")
                 .importClass("io.swagger.annotations.ApiModel")
                 .importClass("com.wondernect.elements.rdb.request.PageRequestDTO")
                 .addTo(dtoDirectory);
