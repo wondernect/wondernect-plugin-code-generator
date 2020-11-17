@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.wondernect.plugin.code-generator</id>
   <name>Wondernect Code Generator</name>
-  <version>1.6</version>
+  <version>1.7</version>
   <vendor email="sunbeamhome@163.com" url="http://plugins.wondernect.com">WondernectPlugin</vendor>
 
   <description><![CDATA[
@@ -10,6 +10,8 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      删除默认导入导出代码生成，更新excel item handler生成代码.<br>
+      <em>1.7</em><br>
       excel response item handler自动生成.<br>
       <em>1.6</em><br>
       添加excel导出接口自动生成.<br>
@@ -41,7 +43,7 @@
 
   <actions>
     <!-- Add your actions here -->
-    <action id="com.wondernect.stars.ExcelExportItemHandlerGeneratorAction" class="com.wondernect.plugins.code.generator.ExcelExportItemHandlerCodeGeneratorAction" text="ExportHandlerGenerate" description="ExcelExportItemHandler代码生成菜单">
+    <action id="com.wondernect.stars.ExcelExportItemHandlerGeneratorAction" class="com.wondernect.plugins.code.generator.ExcelItemHandlerCodeGeneratorAction" text="ExcelItemHandlerGenerate" description="ExcelItemHandler代码生成菜单">
       <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
     </action>
     <action id="com.wondernect.stars.BaseRDBCodeGeneratorAction" class="com.wondernect.plugins.code.generator.BaseRDBCodeGeneratorAction" text="BaseRDBModelGenerate" description="继承BaseRDBModel实体类代码生成菜单">

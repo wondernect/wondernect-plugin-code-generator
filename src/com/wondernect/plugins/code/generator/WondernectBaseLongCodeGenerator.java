@@ -342,8 +342,6 @@ public class WondernectBaseLongCodeGenerator {
                 .importClass("lombok.NoArgsConstructor")
                 .importClass("lombok.AllArgsConstructor")
                 .importClass("io.swagger.annotations.ApiModel")
-                .importClass("io.swagger.annotations.ApiModelProperty")
-                .importClass("com.fasterxml.jackson.annotation.JsonProperty")
                 .importClass("com.wondernect.elements.rdb.request.ListRequestDTO")
                 .addTo(dtoDirectory);
         entityClass.setListRequestDTOName(listRequestDTOName);
@@ -371,8 +369,6 @@ public class WondernectBaseLongCodeGenerator {
                 .importClass("lombok.NoArgsConstructor")
                 .importClass("lombok.AllArgsConstructor")
                 .importClass("io.swagger.annotations.ApiModel")
-                .importClass("io.swagger.annotations.ApiModelProperty")
-                .importClass("com.fasterxml.jackson.annotation.JsonProperty")
                 .importClass("com.wondernect.elements.rdb.request.PageRequestDTO")
                 .addTo(dtoDirectory);
         entityClass.setPageRequestDTOName(pageRequestDTOName);
@@ -418,16 +414,6 @@ public class WondernectBaseLongCodeGenerator {
                 "\n**/" +
                 "\nPageResponseData<" + entityClass.getResponseDTOName() + "> page(" + entityClass.getPageRequestDTOName() + " " + entityClass.getPageRequestDTOVariableName() + "); " +
 
-                "\n/** " +
-                "\n * 获取excel的所有可用列名、类型、描述、get方法、set方法" +
-                "\n**/" +
-                "\nList<ESExcelItem> excelItemList(); " +
-
-                "\n/** " +
-                "\n * excel导出" +
-                "\n**/" +
-                "\nvoid excelDataExport(String exportServiceIdentifier, " + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() + ", HttpServletRequest request, HttpServletResponse response); " +
-
                 "\n}";
         ClassCreator.of(module).init(serviceInterfaceName, content)
                 .importClass(entityClass.getRequestDTOName())
@@ -436,9 +422,6 @@ public class WondernectBaseLongCodeGenerator {
                 .importClass(entityClass.getPageRequestDTOName())
                 .importClass("java.util.List")
                 .importClass("com.wondernect.elements.rdb.response.PageResponseData")
-                .importClass("com.wondernect.elements.easyoffice.excel.ESExcelItem")
-                .importClass("javax.servlet.http.HttpServletRequest")
-                .importClass("javax.servlet.http.HttpServletResponse")
                 .addTo(serviceInterfaceDirectory);
         entityClass.setServiceInterfaceName(serviceInterfaceName);
     }
@@ -492,16 +475,6 @@ public class WondernectBaseLongCodeGenerator {
                 "\n}" +
 
                 "\n@Override" +
-                "\npublic List<ESExcelItem> excelItemList() {" +
-                "\nreturn super.excelItemList(" + entityClass.getResponseDTOName() + ".class);" +
-                "\n}" +
-
-                "\n@Override" +
-                "\npublic void excelDataExport(String exportServiceIdentifier, " + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() + ", HttpServletRequest request, HttpServletResponse response) {" +
-                "\nsuper.excelDataExport(exportServiceIdentifier, excelItemList(), list(" + entityClass.getListRequestDTOVariableName() + "), \"" + excelExportName + "\", \"" + excelExportName + "\", \"" + excelExportName + "\", request, response);" +
-                "\n}" +
-
-                "\n@Override" +
                 "\npublic " + entityClass.getResponseDTOName() + " generate(" + entityClass.getEntityName() + " " + entityClass.getEntityVariableName() + ") {" +
                 "\n" + entityClass.getResponseDTOName() + " " + entityClass.getResponseDTOVariableName() + " = new " + entityClass.getResponseDTOName() + "();" +
                 "\nESBeanUtils.copyProperties(" + entityClass.getEntityVariableName() + ", " + entityClass.getResponseDTOVariableName() + ");" +
@@ -509,13 +482,10 @@ public class WondernectBaseLongCodeGenerator {
                 "\n}" +
 
                 "\n@Override" +
-                "\npublic List<ESExcelItemHandler> generateExcelExportItemHandlerList(String exportServiceIdentifier) {" +
-                "\nswitch (exportServiceIdentifier) {" +
-                "\ndefault:" +
-                "\n{" +
-                "\nreturn new ArrayList<>();" +
-                "\n}" +
-                "\n}" +
+                "\npublic " + entityClass.getEntityName() + " generate(" + entityClass.getResponseDTOName() + " " + entityClass.getResponseDTOVariableName() + ") {" +
+                "\n" + entityClass.getEntityName() + " " + entityClass.getEntityVariableName() + " = new " + entityClass.getEntityName() + "();" +
+                "\nESBeanUtils.copyWithoutNullAndIgnoreProperties(" + entityClass.getResponseDTOVariableName() + ", " + entityClass.getEntityVariableName() + ");" +
+                "\nreturn " + entityClass.getEntityVariableName() + ";" +
                 "\n}" +
 
                 "\n}"
@@ -533,21 +503,13 @@ public class WondernectBaseLongCodeGenerator {
                         .importClass(entityClass.getPageRequestDTOName())
                         .importClass("org.springframework.stereotype.Service")
                         .importClass("org.springframework.transaction.annotation.Transactional")
-                        .importClass("java.util.Map")
                         .importClass("java.util.List")
-                        .importClass("java.util.ArrayList")
                         .importClass(baseLongServiceClass)
                         .importClass("com.wondernect.elements.rdb.criteria.Criteria")
                         .importClass("com.wondernect.elements.rdb.response.PageResponseData")
                         .importClass("com.wondernect.elements.common.utils.ESBeanUtils")
                         .importClass("com.wondernect.elements.common.utils.ESObjectUtils")
                         .importClass("com.wondernect.elements.common.exception.BusinessException")
-                        .importClass("com.wondernect.elements.easyoffice.excel.ESExcelItem")
-                        .importClass("com.wondernect.elements.easyoffice.excel.ESExcelUtils")
-                        .importClass("com.wondernect.elements.easyoffice.excel.ESExcelItemHandler")
-                        .importClass("org.apache.commons.collections4.CollectionUtils")
-                        .importClass("javax.servlet.http.HttpServletRequest")
-                        .importClass("javax.servlet.http.HttpServletResponse")
                         .addTo(serviceAbstractDirectory)
         );
         entityClass.setServiceAbstractName(serviceAbstractName);
@@ -630,21 +592,6 @@ public class WondernectBaseLongCodeGenerator {
                 "\nreturn new BusinessData<>(" + entityClass.getServiceVariableName() + ".page(" + entityClass.getPageRequestDTOVariableName() +"));" +
                 "\n}" +
 
-                "\n@ApiOperation(value = \"获取excel的所有可用列名、类型、描述、get方法、set方法\", httpMethod = \"GET\")\n@GetMapping(value = \"/excel_item_list\")" +
-                "\npublic BusinessData<List<ESExcelItem>> excelItemList() {" +
-                "\nreturn new BusinessData<>(" + entityClass.getServiceVariableName() + ".excelItemList());" +
-                "\n}" +
-
-                "\n@ApiOperation(value = \"excel导出\", httpMethod = \"POST\")\n@PostMapping(value = \"/excel_data_export\")" +
-                "\npublic void excelDataExport(" +
-                "\n@ApiParam(required = true) @NotBlank(message = \"excel导出服务id不能为空\") @RequestParam(value = \"export_service_identifier\", required = false) String exportServiceIdentifier," +
-                "\n@ApiParam(required = true) @NotNull(message = \"列表请求参数不能为空\") @Validated @RequestBody(required = false) " + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() + "," +
-                "\nHttpServletRequest request," +
-                "\nHttpServletResponse response" +
-                "\n) {" +
-                "\n" + entityClass.getServiceVariableName() + ".excelDataExport(exportServiceIdentifier, " + entityClass.getListRequestDTOVariableName() +", request, response);" +
-                "\n}" +
-
                 "\n}"
                 ;
 
@@ -674,10 +621,6 @@ public class WondernectBaseLongCodeGenerator {
                 .importClass("com.wondernect.elements.common.response.BusinessData")
                 .importClass("com.wondernect.elements.common.error.BusinessError")
                 .importClass("org.springframework.validation.annotation.Validated")
-                .importClass("com.wondernect.elements.easyoffice.excel.ESExcelItem")
-                .importClass("com.wondernect.elements.easyoffice.excel.ESExcelUtils")
-                .importClass("javax.servlet.http.HttpServletRequest")
-                .importClass("javax.servlet.http.HttpServletResponse")
                 .addTo(controllerDirectory);
     }
 

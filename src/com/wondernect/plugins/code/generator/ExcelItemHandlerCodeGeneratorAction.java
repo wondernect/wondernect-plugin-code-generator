@@ -14,7 +14,7 @@ import com.wondernect.plugins.code.generator.dialog.FormDialog;
  *
  * @author cxhome
  */
-public class ExcelExportItemHandlerCodeGeneratorAction extends AnAction {
+public class ExcelItemHandlerCodeGeneratorAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {

@@ -22,7 +22,7 @@ import java.util.function.Consumer;
  * Date: 2020-06-21 23:30
  * Description: wondernect code generator
  */
-public class WondernectExcelExportItemHandlerCodeGenerator {
+public class WondernectExcelItemHandlerCodeGenerator {
 
     private PsiDirectory workDir;
     private Map<String, PsiDirectory> directoryMap = new HashMap<>();
@@ -37,7 +37,7 @@ public class WondernectExcelExportItemHandlerCodeGenerator {
     private String version;
     private String service;
 
-    public WondernectExcelExportItemHandlerCodeGenerator(Project project, PsiFile psiFile, String author, String version, String service) {
+    public WondernectExcelItemHandlerCodeGenerator(Project project, PsiFile psiFile, String author, String version, String service) {
         this.project = project;
         this.psiFile = psiFile;
         this.author = author;
@@ -100,7 +100,7 @@ public class WondernectExcelExportItemHandlerCodeGenerator {
      * 初始化所有文件夹
      */
     private void initDirs() {
-        List<String> directories = Arrays.asList("excel_export");
+        List<String> directories = Arrays.asList("excel");
         directoryMap.clear();
         directories.forEach(dir -> {
             // 创建1级目录
@@ -127,18 +127,29 @@ public class WondernectExcelExportItemHandlerCodeGenerator {
      * 创建excel export item handler
      */
     private void createExcelExportItemHandler(EntityClass entityClass) {
-        String dir = currentDirectory == null ? "excel_export" : "excel_export/" + currentDirectory;
+        String dir = currentDirectory == null ? "excel" : "excel/" + currentDirectory;
         PsiDirectory excelExportItemDirectory = directoryMap.get(dir);
         if (entityClass.getResponseFields() != null && entityClass.getResponseFields().size() > 0) {
             for (String itemName : entityClass.getResponseFields().keySet()) {
                 String itemType = entityClass.getResponseFields().get(itemName);
                 String description = entityClass.getResponseFieldsDescription().get(itemName);
-                String excelExportItemHandlerName = entityClass.getEntityName() + PsiStringUtils.firstLetterToUpper(itemName) + "ExportHandler";
+                String excelItemHandlerName = entityClass.getEntityName() + PsiStringUtils.firstLetterToUpper(itemName) + "Handler";
                 ClassCreator.of(module).init(
-                        excelExportItemHandlerName,
-                        getCommentContent(description + "导出item handler", entityClass.getAuthor()) +
-                                "\n@Service" +
-                                "\npublic class " + excelExportItemHandlerName + " implements ESExcelItemHandler<" + itemType + "> {\n" +
+                        excelItemHandlerName,
+                        getCommentContent(description + "导入导出item handler", entityClass.getAuthor()) +
+                                "\npublic class " + excelItemHandlerName + " extends ESExcelItemHandler<" + itemType + "> {\n" +
+
+                                "\npublic " + excelItemHandlerName + "() {" +
+                                "\nsuper(\"" + itemName + "\", 0);" +
+                                "}" +
+
+                                "\npublic " + excelItemHandlerName + "(int itemOrder) {" +
+                                "\nsuper(\"" + itemName + "\", itemOrder);" +
+                                "}" +
+
+                                "\npublic " + excelItemHandlerName + "(String itemTitle, int itemOrder) {" +
+                                "\nsuper(itemTitle, itemOrder);" +
+                                "}" +
 
                                 "\n@Override" +
                                 "\npublic String itemName() {" +
@@ -146,29 +157,18 @@ public class WondernectExcelExportItemHandlerCodeGenerator {
                                 "}" +
 
                                 "\n@Override" +
-                                "\npublic String itemTitle() {" +
-                                "\nreturn \"" + description + "\";" +
-                                "}" +
-
-                                "\n@Override" +
-                                "\npublic int itemOrder() {" +
-                                "\nreturn 0;" +
-                                "}" +
-
-                                "\n@Override" +
-                                "\npublic Boolean hidden() {" +
-                                "\nreturn false;" +
-                                "}" +
-
-                                "\n@Override" +
                                 "\npublic Object handleExcelExportItemObject(" + itemType + " object) {" +
-                                "\nreturn object;" +
+                                "\nreturn null;" +
+                                "}" +
+
+                                "\n@Override" +
+                                "\npublic " + itemType + "  handleExcelImportItemObject(Object object) {" +
+                                "\nreturn null;" +
                                 "}" +
 
                                 "}"
                 )
                         .importClass("com.wondernect.elements.easyoffice.excel.ESExcelItemHandler")
-                        .importClass("org.springframework.stereotype.Service")
                         .addTo(excelExportItemDirectory);
             }
         }

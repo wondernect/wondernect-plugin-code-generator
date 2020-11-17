@@ -112,8 +112,8 @@ public class FormSwing {
                     }
                     case 4:
                     {
-                        WondernectExcelExportItemHandlerCodeGenerator wondernectExcelExportItemHandlerCodeGenerator = new WondernectExcelExportItemHandlerCodeGenerator(project, psiFile, author, version, service);
-                        wondernectExcelExportItemHandlerCodeGenerator.generateCode();
+                        WondernectExcelItemHandlerCodeGenerator wondernectExcelItemHandlerCodeGenerator = new WondernectExcelItemHandlerCodeGenerator(project, psiFile, author, version, service);
+                        wondernectExcelItemHandlerCodeGenerator.generateCode();
                         break;
                     }
                     default:
