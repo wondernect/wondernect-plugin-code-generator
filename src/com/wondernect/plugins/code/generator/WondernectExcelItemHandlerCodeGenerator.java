@@ -136,15 +136,15 @@ public class WondernectExcelItemHandlerCodeGenerator {
                 String excelItemHandlerName = entityClass.getEntityName() + PsiStringUtils.firstLetterToUpper(itemName) + "Handler";
                 ClassCreator.of(module).init(
                         excelItemHandlerName,
-                        getCommentContent(description + "导入导出item handler", entityClass.getAuthor()) +
+                        getCommentContent(entityClass.getEntityDescription() + "导入导出item handler", entityClass.getAuthor()) +
                                 "\npublic class " + excelItemHandlerName + " extends ESExcelItemHandler<" + itemType + "> {\n" +
 
                                 "\npublic " + excelItemHandlerName + "() {" +
-                                "\nsuper(\"" + itemName + "\", 0);" +
+                                "\nsuper(\"" + description + "\", 0);" +
                                 "}" +
 
                                 "\npublic " + excelItemHandlerName + "(int itemOrder) {" +
-                                "\nsuper(\"" + itemName + "\", itemOrder);" +
+                                "\nsuper(\"" + description + "\", itemOrder);" +
                                 "}" +
 
                                 "\npublic " + excelItemHandlerName + "(String itemTitle, int itemOrder) {" +
