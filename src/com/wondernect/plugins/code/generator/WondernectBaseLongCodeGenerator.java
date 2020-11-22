@@ -477,13 +477,6 @@ public class WondernectBaseLongCodeGenerator {
                 "\nreturn " + entityClass.getResponseDTOVariableName() + ";" +
                 "\n}" +
 
-                "\n@Override" +
-                "\npublic " + entityClass.getEntityName() + " generate(" + entityClass.getResponseDTOName() + " " + entityClass.getResponseDTOVariableName() + ") {" +
-                "\n" + entityClass.getEntityName() + " " + entityClass.getEntityVariableName() + " = new " + entityClass.getEntityName() + "();" +
-                "\nESBeanUtils.copyWithoutNullAndIgnoreProperties(" + entityClass.getResponseDTOVariableName() + ", " + entityClass.getEntityVariableName() + ");" +
-                "\nreturn " + entityClass.getEntityVariableName() + ";" +
-                "\n}" +
-
                 "\n}"
                 ;
         getBaseClass(
