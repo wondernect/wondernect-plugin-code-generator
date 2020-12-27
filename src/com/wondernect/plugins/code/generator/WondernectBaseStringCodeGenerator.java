@@ -250,6 +250,7 @@ public class WondernectBaseStringCodeGenerator {
         ClassCreator.of(module).init(
                 responseDTOName,
                 getCommentContent(entityClass.getEntityDescription() + "响应DTO", entityClass.getAuthor()) +
+                        "\n@EqualsAndHashCode(callSuper = true)" +
                         "\n@Data" +
                         "\n@NoArgsConstructor" +
                         "\n@AllArgsConstructor" +
@@ -258,6 +259,7 @@ public class WondernectBaseStringCodeGenerator {
                         "\n" + getFieldsContentForRESDTO(entityClass) +
                         "}"
         )
+                .importClass("lombok.EqualsAndHashCode")
                 .importClass("lombok.Data")
                 .importClass("lombok.NoArgsConstructor")
                 .importClass("lombok.AllArgsConstructor")
