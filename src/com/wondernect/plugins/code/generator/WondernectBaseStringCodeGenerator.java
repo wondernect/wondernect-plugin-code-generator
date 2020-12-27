@@ -785,7 +785,7 @@ public class WondernectBaseStringCodeGenerator {
                                 String lengthStr = str.substring(0, idx).replaceAll("\"", "");
                                 if (StringUtils.isNotBlank(lengthStr)) {
                                     int length = Integer.parseInt(lengthStr);
-                                    content = content + "\n@Length(max = " + length + ", message = \"" + description + "长度不能超过" + length + "字符(1汉字=2字符)\")";
+                                    content = content + "\n@Length(max = " + length + ", message = \"" + description + "长度不能超过" + length + "\")";
                                 }
                             }
                         }
