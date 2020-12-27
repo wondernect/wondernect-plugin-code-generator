@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.wondernect.plugin.code-generator</id>
   <name>Wondernect Code Generator</name>
-  <version>1.10</version>
+  <version>1.11</version>
   <vendor email="sunbeamhome@163.com" url="http://plugins.wondernect.com">WondernectPlugin</vendor>
 
   <description><![CDATA[
@@ -10,6 +10,8 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      更新controller生成代码.<br>
+      <em>1.11</em><br>
       删除默认导入导出代码生成，更新excel item handler生成代码.<br>
       <em>1.8</em><br>
       excel response item handler自动生成.<br>

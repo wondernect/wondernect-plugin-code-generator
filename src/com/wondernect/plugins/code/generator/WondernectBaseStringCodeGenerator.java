@@ -610,46 +610,46 @@ public class WondernectBaseStringCodeGenerator {
                 "\npublic class " + controllerName +  "{\n" +
                 "\n@Autowired\nprivate " + entityClass.getServiceName() + " " + entityClass.getServiceVariableName() + ";\n" +
 
-                "\n@ApiOperation(value = \"创建\", httpMethod = \"POST\")\n@PostMapping(value = \"/create\")" +
+                "\n@ApiOperation(value = \"创建\", notes = \"创建\", httpMethod = \"POST\")\n@PostMapping(value = \"/create\")" +
                 "\npublic BusinessData<" + entityClass.getResponseDTOName() + "> create(" +
-                "\n@ApiParam(required = true) @NotNull(message = \"请求参数不能为空\") @Validated @RequestBody(required = false) " + entityClass.getRequestDTOName() + " " + entityClass.getRequestDTOVariableName() +
+                "\n@ApiParam(value = \"创建请求对象\", required = true) @NotNull(message = \"请求参数不能为空\") @Validated @RequestBody(required = false) " + entityClass.getRequestDTOName() + " " + entityClass.getRequestDTOVariableName() +
                 "\n) {" +
                 "\nreturn new BusinessData<>(" + entityClass.getServiceVariableName() + ".create(" + entityClass.getRequestDTOVariableName() +"));" +
                 "\n}" +
 
-                "\n@ApiOperation(value = \"更新\", httpMethod = \"POST\")\n@PostMapping(value = \"/{id}/update\")" +
+                "\n@ApiOperation(value = \"更新\", notes = \"更新\", httpMethod = \"POST\")\n@PostMapping(value = \"/{id}/update\")" +
                 "\npublic BusinessData<" + entityClass.getResponseDTOName() + "> update(" +
-                "\n@ApiParam(required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) String id," +
-                "\n@ApiParam(required = true) @NotNull(message = \"请求参数不能为空\") @Validated @RequestBody(required = false) " + entityClass.getRequestDTOName() + " " + entityClass.getRequestDTOVariableName() +
+                "\n@ApiParam(value = \"对象id\", required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) String id," +
+                "\n@ApiParam(value = \"更新请求对象\", required = true) @NotNull(message = \"请求参数不能为空\") @Validated @RequestBody(required = false) " + entityClass.getRequestDTOName() + " " + entityClass.getRequestDTOVariableName() +
                 "\n) {" +
                 "\nreturn new BusinessData<>(" + entityClass.getServiceVariableName() + ".update(id, " + entityClass.getRequestDTOVariableName() +"));" +
                 "\n}" +
 
-                "\n@ApiOperation(value = \"删除\", httpMethod = \"POST\")\n@PostMapping(value = \"/{id}/delete\")" +
+                "\n@ApiOperation(value = \"删除\", notes = \"删除\", httpMethod = \"POST\")\n@PostMapping(value = \"/{id}/delete\")" +
                 "\npublic BusinessData delete(" +
-                "\n@ApiParam(required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) String id" +
+                "\n@ApiParam(value = \"对象id\", required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) String id" +
                 "\n) {" +
                 "\n" + entityClass.getServiceVariableName() + ".deleteById(id);" +
                 "\nreturn new BusinessData(BusinessError.SUCCESS);" +
                 "\n}" +
 
-                "\n@ApiOperation(value = \"获取详细信息\", httpMethod = \"GET\")\n@GetMapping(value = \"/{id}/detail\")" +
+                "\n@ApiOperation(value = \"获取详细信息\", notes = \"获取详细信息\", httpMethod = \"GET\")\n@GetMapping(value = \"/{id}/detail\")" +
                 "\npublic BusinessData<" + entityClass.getResponseDTOName() + "> detail(" +
-                "\n@ApiParam(required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) String id" +
+                "\n@ApiParam(value = \"对象id\", required = true) @NotBlank(message = \"对象id不能为空\") @PathVariable(value = \"id\", required = false) String id" +
                 "\n) {" +
                 "\nreturn new BusinessData<>(" + entityClass.getServiceVariableName() + ".findById(id));" +
                 "\n}" +
 
-                "\n@ApiOperation(value = \"列表\", httpMethod = \"POST\")\n@PostMapping(value = \"/list\")" +
+                "\n@ApiOperation(value = \"列表\", notes = \"列表\", httpMethod = \"POST\")\n@PostMapping(value = \"/list\")" +
                 "\npublic BusinessData<List<" + entityClass.getResponseDTOName() + ">> list(" +
-                "\n@ApiParam(required = true) @NotNull(message = \"列表请求参数不能为空\") @Validated @RequestBody(required = false) " + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() +
+                "\n@ApiParam(value = \"列表请求对象\", required = true) @NotNull(message = \"列表请求参数不能为空\") @Validated @RequestBody(required = false) " + entityClass.getListRequestDTOName() + " " + entityClass.getListRequestDTOVariableName() +
                 "\n) {" +
                 "\nreturn new BusinessData<>(" + entityClass.getServiceVariableName() + ".list(" + entityClass.getListRequestDTOVariableName() +"));" +
                 "\n}" +
 
-                "\n@ApiOperation(value = \"分页\", httpMethod = \"POST\")\n@PostMapping(value = \"/page\")" +
+                "\n@ApiOperation(value = \"分页\", notes = \"分页\", httpMethod = \"POST\")\n@PostMapping(value = \"/page\")" +
                 "\npublic BusinessData<PageResponseData<" + entityClass.getResponseDTOName() + ">> page(" +
-                "\n@ApiParam(required = true) @NotNull(message = \"分页请求参数不能为空\") @Validated @RequestBody(required = false) " + entityClass.getPageRequestDTOName() + " " + entityClass.getPageRequestDTOVariableName() +
+                "\n@ApiParam(value = \"分页请求对象\", required = true) @NotNull(message = \"分页请求参数不能为空\") @Validated @RequestBody(required = false) " + entityClass.getPageRequestDTOName() + " " + entityClass.getPageRequestDTOVariableName() +
                 "\n) {" +
                 "\nreturn new BusinessData<>(" + entityClass.getServiceVariableName() + ".page(" + entityClass.getPageRequestDTOVariableName() +"));" +
                 "\n}" +
